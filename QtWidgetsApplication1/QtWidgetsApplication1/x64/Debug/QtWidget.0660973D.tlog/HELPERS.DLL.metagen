@@ -1,0 +1,30 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly Helpers, Version=1.0.*, Culture=固定语言(固定国家/地区): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly ICSharpCode.SharpZipLib, Version=1.0.0.999, Culture=neutral, PublicKeyToken=1b03e6acf1164f73: 
+	hash=None, flags=None
+Class Helpers.EncryptHelper: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    Md5Encode(String, Int32(Optional, HasDefault)): PrivateScope, Public, Static, HideBySig
+    SHA1Encrypt(String): PrivateScope, Public, Static, HideBySig
+    SHA256Encrypt(String): PrivateScope, Public, Static, HideBySig
+    SHA384Encrypt(String): PrivateScope, Public, Static, HideBySig
+    SHA512Encrypt(String): PrivateScope, Public, Static, HideBySig
+    EncryptDES(String, String): PrivateScope, Public, Static, HideBySig
+    EncryptDESECB(Byte[], String): PrivateScope, Public, Static, HideBySig
+    DecryptDES(String, String): PrivateScope, Public, Static, HideBySig
+    DecryptDESECB(String, String): PrivateScope, Public, Static, HideBySig
+    Base64Encode(String): PrivateScope, Public, Static, HideBySig
+    Base64Decode(String): PrivateScope, Public, Static, HideBySig
+    VIPEncode(String, Char(Optional, HasDefault)): PrivateScope, Public, Static, HideBySig
+    VIPDecode(String, Char(Optional, HasDefault)): PrivateScope, Public, Static, HideBySig
+    IsValidVIPCode(String): PrivateScope, Public, Static, HideBySig
+    ZipEncode(Byte[]): PrivateScope, Public, Static, HideBySig
+    ZipEncode2(String): PrivateScope, Public, Static, HideBySig
+    ZipDecode(Byte[]): PrivateScope, Public, Static, HideBySig
+    ZipDecode2(String): PrivateScope, Public, Static, HideBySig

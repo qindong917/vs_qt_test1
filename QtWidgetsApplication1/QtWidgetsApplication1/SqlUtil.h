@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include "QtContent.h"
 
 class SqlUtil
 {
@@ -16,10 +17,10 @@ class SqlUtil
 		int update(QSqlQuery sql_query, int type, QString content);
 
 
-		QStringList query(QSqlQuery sql_query,int type, QStringList &uuidlist);
+		QList<QtContent*> query(QSqlQuery sql_query,int type);
 
 
-		int deletedata(QSqlQuery sql_query, QString uuid);
+		int deletedata(QSqlQuery sql_query, QString content);
 
 
 		int deletetable(QSqlQuery sql_query);

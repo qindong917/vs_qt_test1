@@ -2,19 +2,29 @@
 
 #include <QObject>
 
+struct QtContentalDataPrivate; // 声明私有数据成员类型
+
+
 class QtContent : public QObject
 {
-	Q_OBJECT
-
 
 public:
-	QtContent(QObject *parent);
-	QtContent();
-	~QtContent();
 
-public:
-	QString uuid;
-	QString content;
-	int type;
+	QtContent(); // constructor
+	virtual ~QtContent(); // destructor
+
+	void setContent(const QString);
+	QString getContent();
+
+	void setType(const int);
+	int getType();
+
+
+private:
+
+	QtContentalDataPrivate *d;
+
+
 
 };
+

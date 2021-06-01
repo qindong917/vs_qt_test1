@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_QtWidgetsApplication1.h"
-#include<QMessageBox>
+//#include<QMessageBox>
 
 
 class QtWidgetsApplication1 : public QMainWindow

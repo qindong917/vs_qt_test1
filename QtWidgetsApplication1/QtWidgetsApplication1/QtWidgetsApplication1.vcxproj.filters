@@ -46,6 +46,9 @@
     <ClCompile Include="QtContent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="person.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QtWidgetsApplication1.rc">
@@ -62,17 +65,26 @@
     <ClInclude Include="SqlUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="person.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QtContent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="QtWidgetsApplication1.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="QtContent.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <Image Include="logo.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="images\delete.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="images\delete_on.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

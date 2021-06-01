@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>QtWidgetsApplication1</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="QtWidgetsApplication1.qrc">
+    <normaloff>:/QtWidgetsApplication1/images/logo.ico</normaloff>:/QtWidgetsApplication1/images/logo.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
@@ -74,22 +78,14 @@
        <number>0</number>
       </property>
       <property name="styleSheet">
-       <string notr="true">
-</string>
+       <string notr="true"/>
       </property>
       <property name="text">
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>images/delete.ico</normaloff>
-        <normalon>images/delete_on.ico</normalon>
-        <disabledoff>images/delete.ico</disabledoff>
-        <disabledon>images/delete_on.ico</disabledon>
-        <activeoff>images/delete.ico</activeoff>
-        <activeon>images/delete_on.ico</activeon>
-        <selectedoff>images/delete.ico</selectedoff>
-        <selectedon>images/delete_on.ico</selectedon>images/delete.ico</iconset>
+       <iconset resource="QtWidgetsApplication1.qrc">
+        <normaloff>:/QtWidgetsApplication1/images/delete.ico</normaloff>:/QtWidgetsApplication1/images/delete.ico</iconset>
       </property>
       <property name="checkable">
        <bool>false</bool>
@@ -143,22 +139,14 @@
        <number>0</number>
       </property>
       <property name="styleSheet">
-       <string notr="true">
-</string>
+       <string notr="true"/>
       </property>
       <property name="text">
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>images/delete.ico</normaloff>
-        <normalon>images/delete_on.ico</normalon>
-        <disabledoff>images/delete.ico</disabledoff>
-        <disabledon>images/delete_on.ico</disabledon>
-        <activeoff>images/delete.ico</activeoff>
-        <activeon>images/delete_on.ico</activeon>
-        <selectedoff>images/delete.ico</selectedoff>
-        <selectedon>images/delete_on.ico</selectedon>images/delete.ico</iconset>
+       <iconset resource="QtWidgetsApplication1.qrc">
+        <normaloff>:/QtWidgetsApplication1/images/delete.ico</normaloff>:/QtWidgetsApplication1/images/delete.ico</iconset>
       </property>
       <property name="checkable">
        <bool>false</bool>
@@ -215,15 +203,8 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>images/delete.ico</normaloff>
-        <normalon>images/delete_on.ico</normalon>
-        <disabledoff>images/delete.ico</disabledoff>
-        <disabledon>images/delete_on.ico</disabledon>
-        <activeoff>images/delete.ico</activeoff>
-        <activeon>images/delete_on.ico</activeon>
-        <selectedoff>images/delete.ico</selectedoff>
-        <selectedon>images/delete_on.ico</selectedon>images/delete.ico</iconset>
+       <iconset resource="QtWidgetsApplication1.qrc">
+        <normaloff>:/QtWidgetsApplication1/images/delete.ico</normaloff>:/QtWidgetsApplication1/images/delete.ico</iconset>
       </property>
       <property name="checkable">
        <bool>false</bool>

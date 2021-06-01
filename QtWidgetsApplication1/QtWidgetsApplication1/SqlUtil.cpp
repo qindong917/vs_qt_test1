@@ -1,13 +1,15 @@
 #include "SqlUtil.h"
 QSqlDatabase database;
 
-#include <QUuid>
-#include "QtContent.h"
+#include <QDateTime>
+
 
 QSqlQuery SqlUtil::OpenSql() {
 
 	database = QSqlDatabase::addDatabase("QSQLITE");
+
 	database.setDatabaseName("MyDataBase.db");
+
 	if (!database.open())
 	{
 		qDebug() << "@Error: Failed to connect database." << database.lastError();
@@ -19,7 +21,8 @@ QSqlQuery SqlUtil::OpenSql() {
 
 	//创建表格
 	QSqlQuery sql_query;
-	if (!sql_query.exec("create table notes(content text primary key, type int ,uuid text)"))
+
+	if (!sql_query.exec("create table notes(content text primary key, type int)"))
 	{
 		qDebug() << "@Error: Fail to create table." << sql_query.lastError();
 	}
@@ -35,13 +38,11 @@ QSqlQuery SqlUtil::OpenSql() {
 //插入数据
 int SqlUtil::insert(QSqlQuery sql_query, int type, QString content) {
 
-	sql_query.prepare("INSERT INTO notes (content, type, uuid) VALUES(:content, :type, :uuid)");
+	sql_query.prepare("INSERT INTO notes (content, type) VALUES(:content, :type)");
 
 	sql_query.bindValue(":content", content);
 
 	sql_query.bindValue(":type", type);
-
-	sql_query.bindValue(":uuid", QUuid::createUuid().toString());
 
 	if (!sql_query.exec())
 	{
@@ -61,8 +62,9 @@ int SqlUtil::insert(QSqlQuery sql_query, int type, QString content) {
 int SqlUtil::update(QSqlQuery sql_query, int type, QString content) {
 
 	//修改数据
-	;
-	if (!sql_query.exec("update notes set content = " + content + " where type = " + type + ""))
+	QString str = QString("update notes set content = %1 ").arg(content);
+
+	if (!sql_query.exec(str))
 	{
 		qDebug() << sql_query.lastError() << content;
 
@@ -76,11 +78,14 @@ int SqlUtil::update(QSqlQuery sql_query, int type, QString content) {
 	}
 }
 
-QStringList SqlUtil::query(QSqlQuery sql_query,int type,QStringList &uuidlist) {
+QList<QtContent*> SqlUtil::query(QSqlQuery sql_query, int type) {
 
-	QStringList list;
+	QList<QtContent*> list;
 	//查询数据
-	sql_query.exec("select * from notes where type = " + QString::number(type));
+	QString str = QString("select * from notes where type =%1 ").arg(type);
+
+	sql_query.exec(str);
+
 	if (!sql_query.exec())
 	{
 		qDebug() << sql_query.lastError();
@@ -91,41 +96,48 @@ QStringList SqlUtil::query(QSqlQuery sql_query,int type,QStringList &uuidlist) {
 		while (sql_query.next())
 		{
 			QString content = sql_query.value(0).toString();
+
 			int type = sql_query.value(1).toInt();
-			QString uuid = sql_query.value(3).toString();
-			list.append(content);
-			uuidlist.append(uuid);
-			//ColorSpace* cs = new ColorSpace();
-			QtContent m = new QtContent();
-			qDebug() << QString("type:%1    content:%2").arg(type).arg(content);
+
+			QtContent *m = new QtContent();
+
+			m->setType(type);
+
+			m->setContent(content);
+
+			list.append(m);
 		}
 	}
 	return list;
 }
 
 
-int  SqlUtil::deletedata(QSqlQuery sql_query,QString uuid) {
-	//删除数据
-	sql_query.exec("delete from notes where uuid = " + uuid);
-	if (!sql_query.exec())
+int  SqlUtil::deletedata(QSqlQuery sql_query, QString content) {
+	//删除数据  delete from 表名 where 列名 = 条件;
+	
+	QString str = QString("delete from notes where content= '%1' ").arg(content);
+
+	if (!sql_query.exec(str))
 	{
-		qDebug() << sql_query.lastError() << uuid;
+		qDebug() << sql_query.lastError() << str;
 
 		return -1;
 	}
 	else
 	{
-		qDebug() << "@deleted!" << uuid;
+		qDebug() << "@deleted!" << str;
 
 		return 1;
 	}
-
-
 }
+
 
 int SqlUtil::deletetable(QSqlQuery sql_query) {
 	//删除表格
 	sql_query.exec("drop table notes");
+
+	QString str = QString("drop table notes");
+
 	if (sql_query.exec())
 	{
 		qDebug() << sql_query.lastError();

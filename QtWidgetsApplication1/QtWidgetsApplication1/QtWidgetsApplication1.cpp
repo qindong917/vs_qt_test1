@@ -39,11 +39,16 @@ QString getStringFromJsonObject(const QJsonObject& jsonObject);
 void go(const QString msg);
 
 QStringList list_url;
-int i = 0;
+extern int i = 0, j = 0;
 
-int Url_Type =  1;
-int Pamars_Type = 2;
-int Url_Index = 0, Pamars_Index = 0;
+extern int Url_Type =  1;
+extern int Pamars_Type = 2;
+extern int Url_Index = 0;
+extern int Pamars_Index = 0;
+QList<QtContent*> urllist;
+QList<QtContent*>pamarslist;
+extern int url_uuid;
+extern int pamars_uuid;
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
     : QMainWindow(parent)
@@ -54,32 +59,36 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
 	connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
 	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
-	QStringList urluuidlist;
-	QStringList pamarsuuidlist;
-	QStringList urllist= sql.query(sql.OpenSql(), Url_Type, urluuidlist);
-	QStringList pamarslist= sql.query(sql.OpenSql(), Pamars_Type, pamarsuuidlist);
+
+	urllist= sql.query(sql.OpenSql(), Url_Type);
+	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
 	sql.closeDB();
 
 
 	
-	QString url = "http://pos.caike.com/pos/K12/order/list";
 	ui.comboBox_url->setEditable(true);
-	ui.comboBox_url->insertItems(0, urllist);
+	for(i=0;i<urllist.size();i++)
+	{
+		ui.comboBox_url->addItem(urllist.at(i)->getContent());
+	}
 	if(urllist.size()>0)
-		ui.comboBox_url->setEditText(urllist.at(0));
+		ui.comboBox_url->setEditText(urllist.at(0)->getContent());
 	else
 	{
-		ui.comboBox_url->setEditText(url);
+		ui.comboBox_url->setEditText("");
 	}
 
-	QString qtpamars = "{ \"devcode\":\"16a0995387afaefc3afa6d7ce0a25c64\", \"btime\":\"2021 - 05 - 20 00:00 : 00\", \"offset\":0, \"etime\":\"2021 - 05 - 20 15 : 25 : 51\", \"format\":\"yyyy - MM - dd hh24 : mi:ss\", \"limit\":20, \"shopid\":1885, \"type\":1, \"userid\":1498}";
 	ui.comboBox_pamars->setEditable(true);
-	ui.comboBox_pamars->insertItems(0, pamarslist);
+	for (i = 0; i < pamarslist.size(); i++)
+	{
+		ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+	}
+
 	if(pamarslist.size()>0)
-		ui.comboBox_pamars->setEditText(pamarslist.at(0));
+		ui.comboBox_pamars->setEditText(pamarslist.at(0)->getContent());
 	else
 	{
-		ui.comboBox_pamars->setEditText(qtpamars);
+		ui.comboBox_pamars->setEditText("");
 	}
 	
 
@@ -101,7 +110,7 @@ QString UrlRequestPost(const QString url, const QString data)
 	qnr.setRawHeader("Content-Type", "application/json;charset=UTF-8");
 
 	//qnr.setHeader();
-
+	//请求参数
 	QNetworkReply *reply = qnam.post(qnr, data.toLocal8Bit());
 
 
@@ -161,9 +170,22 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 	QString url = ui.comboBox_url->currentText().trimmed();
 
+	if (url.length() <= 0)
+		return;
+
 	if (sql.insert(sql.OpenSql(), Url_Type, url) > 0)
 	{
-		ui.comboBox_url->addItem(url);
+		ui.comboBox_url->clear();
+
+		urllist = sql.query(sql.OpenSql(), Url_Type);
+
+		for (i = 0; i < urllist.size(); i++)
+		{
+			ui.comboBox_url->addItem(urllist.at(i)->getContent());
+		}
+
+		ui.comboBox_url->setEditText(url);
+		
 	};
 
 	Log.i("@请求URL:  %s\n", url.toStdString().c_str());
@@ -172,17 +194,32 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 	if (sql.insert(sql.OpenSql(), Pamars_Type, qtpamars) > 0)
 	{
-		ui.comboBox_pamars->addItem(qtpamars);
+		ui.comboBox_pamars->clear();
+
+		pamarslist = sql.query(sql.OpenSql(), Pamars_Type);
+
+		for (i = 0; i < pamarslist.size(); i++)
+		{
+			ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+		}
+
+		ui.comboBox_pamars->setEditText(qtpamars);
 	};
+
 
 	sql.closeDB();
 
-	Log.i("@请求参数:  %s\n", qtpamars.toStdString().c_str());
+	//QString->std::string 防止乱码
+	
+
+	string stdStrp= string(qtpamars.toLocal8Bit());
+
+	Log.i("@请求参数:  %s\n", stdStrp.c_str());
 
 	EncryptHelper ^helper = gcnew EncryptHelper();
 	
 	//cli数据注意前缀^
-	String^ Clipamars = marshal_as<String^>(qtpamars.toStdString());//std::string->cli::String
+	String^ Clipamars = marshal_as<String^>(stdStrp);//std::string->cli::String
 
 	Text::Encoding ^u8 = Text::Encoding::UTF8;
 
@@ -204,7 +241,9 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 	if(request.length()<=0)
 		return;
 
-	string stdStr	= request.toStdString();//std::string->QString
+	//QString->std::string 防止乱码
+	string stdStr = string(request.toLocal8Bit());
+	//string stdStr	= request.toStdString();//QString->std::string
 
 	char *cstr = new char[stdStr.length() + 1];
 
@@ -255,8 +294,6 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 				string payorderid = jo2.value("payorderid").toString().toStdString();
 				string paytypename = jo2.value("paytypename").toString().toStdString();
 				string ptime = jo2.value("ptime").toString().toStdString();
-
-				Log.i("@返回结果:  %d,%d,%d,%d,%s,%s,%s,%s\n", cost, isrefund, paytype, status, name.c_str(), payorderid.c_str(), paytypename.c_str(), ptime.c_str());
 			}
 		}
 
@@ -277,10 +314,22 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 void QtWidgetsApplication1::on_pushButton_url_clicked()
 {
-	QString currenturl = ui.comboBox_url->currentText().trimmed();
-	if (sql.deletedata(sql.OpenSql(), Url_Type, currenturl) > 0)
+	if (urllist.size() <= 0)
+		return;
+
+	QtContent* q= urllist.at(Url_Index);
+	QString c = q->getContent();
+	if (sql.deletedata(sql.OpenSql(), c) > 0)
 	{
-		ui.comboBox_url->removeItem(Url_Index);
+		ui.comboBox_url->clear();
+
+		urllist = sql.query(sql.OpenSql(), Url_Type);
+
+		for (i = 0; i < urllist.size(); i++)
+		{
+			ui.comboBox_url->addItem(urllist.at(i)->getContent());
+		}	
+		
 		ui.comboBox_url->setEditText("");
 	};
 
@@ -289,10 +338,21 @@ void QtWidgetsApplication1::on_pushButton_url_clicked()
 
 void QtWidgetsApplication1::on_pushButton_pamars_clicked()
 {
-	QString currentpamars = ui.comboBox_pamars->currentText().trimmed();
-	if (sql.deletedata(sql.OpenSql(), Pamars_Type, currentpamars) > 0)
+	if (pamarslist.size() <= 0)
+		return;
+
+	QtContent* q = pamarslist.at(Pamars_Index);
+	QString c = q->getContent();
+	if (sql.deletedata(sql.OpenSql(), c) > 0)
 	{
-		ui.comboBox_pamars->removeItem(Pamars_Index);
+		ui.comboBox_pamars->clear();
+
+		pamarslist = sql.query(sql.OpenSql(), Pamars_Type);
+
+		for (i = 0; i < pamarslist.size(); i++)
+		{
+			ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+		}
 		ui.comboBox_pamars->setEditText("");
 	};
 
@@ -301,7 +361,7 @@ void QtWidgetsApplication1::on_pushButton_pamars_clicked()
 
 void QtWidgetsApplication1::on_pushButton_header_clicked()
 {
-	QMessageBox::about(this, "未完成", "现在用不上，没做！");
+	//QMessageBox::about(this, "未完成", "现在用不上，没做！");
 }
 
 

@@ -7,6 +7,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+//windeployqt
 
 int main(int argc, char *argv[])
 {

@@ -50,6 +50,9 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(QtWidgetsApplication1Class->sizePolicy().hasHeightForWidth());
         QtWidgetsApplication1Class->setSizePolicy(sizePolicy);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/QtWidgetsApplication1/images/logo.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        QtWidgetsApplication1Class->setWindowIcon(icon);
         centralWidget = new QWidget(QtWidgetsApplication1Class);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         sizePolicy.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
@@ -87,16 +90,9 @@ public:
         pushButton_url->setAcceptDrops(false);
         pushButton_url->setToolTipDuration(0);
         pushButton_url->setStyleSheet(QString::fromUtf8(""));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8("images/delete.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        icon.addFile(QString::fromUtf8("images/delete_on.ico"), QSize(), QIcon::Normal, QIcon::On);
-        icon.addFile(QString::fromUtf8("images/delete.ico"), QSize(), QIcon::Disabled, QIcon::Off);
-        icon.addFile(QString::fromUtf8("images/delete_on.ico"), QSize(), QIcon::Disabled, QIcon::On);
-        icon.addFile(QString::fromUtf8("images/delete.ico"), QSize(), QIcon::Active, QIcon::Off);
-        icon.addFile(QString::fromUtf8("images/delete_on.ico"), QSize(), QIcon::Active, QIcon::On);
-        icon.addFile(QString::fromUtf8("images/delete.ico"), QSize(), QIcon::Selected, QIcon::Off);
-        icon.addFile(QString::fromUtf8("images/delete_on.ico"), QSize(), QIcon::Selected, QIcon::On);
-        pushButton_url->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/QtWidgetsApplication1/images/delete.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_url->setIcon(icon1);
         pushButton_url->setCheckable(false);
         pushButton_url->setChecked(false);
         pushButton_url->setFlat(false);
@@ -127,7 +123,7 @@ public:
         pushButton_pamars->setAcceptDrops(false);
         pushButton_pamars->setToolTipDuration(0);
         pushButton_pamars->setStyleSheet(QString::fromUtf8(""));
-        pushButton_pamars->setIcon(icon);
+        pushButton_pamars->setIcon(icon1);
         pushButton_pamars->setCheckable(false);
         pushButton_pamars->setChecked(false);
         pushButton_pamars->setFlat(false);
@@ -154,7 +150,7 @@ public:
         pushButton_header->setTabletTracking(false);
         pushButton_header->setAcceptDrops(false);
         pushButton_header->setToolTipDuration(0);
-        pushButton_header->setIcon(icon);
+        pushButton_header->setIcon(icon1);
         pushButton_header->setCheckable(false);
         pushButton_header->setChecked(false);
         pushButton_header->setFlat(false);

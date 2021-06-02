@@ -74,3 +74,7 @@ QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/qmake/temp/props.txt
 QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/qmake/temp/Makefile
 QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/qmake/temp/0660973D-B986-490B-A2B1-8AFBEABE117D.QtWidgetsApplication1.designtime.idx
 QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/qmake/qtvars_x64_Release.props
+*.log
+*.idx
+*.lastbuildstate
+*.vcxproj

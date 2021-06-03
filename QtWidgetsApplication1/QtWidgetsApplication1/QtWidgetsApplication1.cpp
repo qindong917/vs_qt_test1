@@ -13,6 +13,7 @@
 #include "LogUtil.h"
 
 #include <iostream>
+#include <QClipboard>
 
 #pragma warning(disable : 4996)
 using namespace std;
@@ -49,17 +50,19 @@ QList<QtContent*> urllist;
 QList<QtContent*>pamarslist;
 extern int url_uuid;
 extern int pamars_uuid;
+QClipboard *clipboard;
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
     : QMainWindow(parent)
 {
+	clipboard = QApplication::clipboard();
     ui.setupUi(this);
 	// 将信号 mySignal() 与槽 mySlot() 相关联
 	connect(this, SIGNAL(mySignal(QString)), this,SLOT(mySlot(QString)));
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
 	connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
 	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
-
+	connect(ui.et_result,SIGNAL(copyAvailable(bool)),this,SLOT(mySlotCopy(bool)));
 	urllist= sql.query(sql.OpenSql(), Url_Type);
 	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
 	sql.closeDB();
@@ -426,6 +429,22 @@ void QtWidgetsApplication1::mySlotUrlIndex(int x)
 void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 {
 	Pamars_Index = x;
+}
+
+void QtWidgetsApplication1::mySlotCopy(bool yes)
+{
+	qDebug() << "QtWidgetsApplication1::mySlotCopy()";
+	if (yes) {
+		//connect(clipboard, SIGNAL(dataChanged()), this, SLOT(mySlotCopy2())); // wait tor CTRL+C
+		
+		qDebug() << QString(ui.et_result->document()->toPlainText());
+
+	}
+}
+
+void QtWidgetsApplication1::mySlotCopy2()
+{
+	qDebug() << "QtWidgetsApplication1::mySlotCopy2()";
 }
 
 

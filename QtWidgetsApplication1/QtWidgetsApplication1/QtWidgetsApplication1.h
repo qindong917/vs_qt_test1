@@ -36,6 +36,8 @@ public slots:
 
 	void mySlotPamarsIndex(int x);
 
+	void mySlotCopy(bool);
+
+	void mySlotCopy2();
 
 };
-

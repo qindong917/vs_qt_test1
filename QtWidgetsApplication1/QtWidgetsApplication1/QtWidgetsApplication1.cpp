@@ -56,18 +56,20 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	: QMainWindow(parent)
 {
 	clipboard = QApplication::clipboard();
+
 	ui.setupUi(this);
+
 	// 将信号 mySignal() 与槽 mySlot() 相关联
 	connect(this, SIGNAL(mySignal(QString)), this, SLOT(mySlot(QString)));
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
 	connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
 	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
-	connect(ui.et_result, SIGNAL(copyAvailable(bool)), this, SLOT(mySlotCopy(bool)));
-	urllist = sql.query(sql.OpenSql(), Url_Type);
-	pamarslist = sql.query(sql.OpenSql(), Pamars_Type);
+
+	connect(ui.et_result,SIGNAL(copyAvailable(bool)),this,SLOT(mySlotCopy(bool)));
+	urllist= sql.query(sql.OpenSql(), Url_Type);
+	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
+
 	sql.closeDB();
-
-
 
 	ui.comboBox_url->setEditable(true);
 	for (i = 0; i < urllist.size(); i++)
@@ -436,9 +438,7 @@ void QtWidgetsApplication1::mySlotCopy(bool yes)
 	qDebug() << "QtWidgetsApplication1::mySlotCopy()";
 	if (yes) {
 		//connect(clipboard, SIGNAL(dataChanged()), this, SLOT(mySlotCopy2())); // wait tor CTRL+C
-
 		qDebug() << QString(ui.et_result->document()->toPlainText());
-
 	}
 }
 

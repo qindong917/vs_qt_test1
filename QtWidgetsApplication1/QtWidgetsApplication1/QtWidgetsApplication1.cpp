@@ -13,6 +13,7 @@
 #include "LogUtil.h"
 
 #include <iostream>
+#include <QClipboard>
 
 #pragma warning(disable : 4996)
 using namespace std;
@@ -41,7 +42,7 @@ void go(const QString msg);
 QStringList list_url;
 extern int i = 0, j = 0;
 
-extern int Url_Type =  1;
+extern int Url_Type = 1;
 extern int Pamars_Type = 2;
 extern int Url_Index = 0;
 extern int Pamars_Index = 0;
@@ -49,29 +50,31 @@ QList<QtContent*> urllist;
 QList<QtContent*>pamarslist;
 extern int url_uuid;
 extern int pamars_uuid;
+QClipboard *clipboard;
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
-    : QMainWindow(parent)
+	: QMainWindow(parent)
 {
-    ui.setupUi(this);
+	clipboard = QApplication::clipboard();
+	ui.setupUi(this);
 	// 将信号 mySignal() 与槽 mySlot() 相关联
-	connect(this, SIGNAL(mySignal(QString)), this,SLOT(mySlot(QString)));
+	connect(this, SIGNAL(mySignal(QString)), this, SLOT(mySlot(QString)));
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
 	connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
 	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
-
-	urllist= sql.query(sql.OpenSql(), Url_Type);
-	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
+	connect(ui.et_result, SIGNAL(copyAvailable(bool)), this, SLOT(mySlotCopy(bool)));
+	urllist = sql.query(sql.OpenSql(), Url_Type);
+	pamarslist = sql.query(sql.OpenSql(), Pamars_Type);
 	sql.closeDB();
 
 
-	
+
 	ui.comboBox_url->setEditable(true);
-	for(i=0;i<urllist.size();i++)
+	for (i = 0; i < urllist.size(); i++)
 	{
 		ui.comboBox_url->addItem(urllist.at(i)->getContent());
 	}
-	if(urllist.size()>0)
+	if (urllist.size() > 0)
 		ui.comboBox_url->setEditText(urllist.at(0)->getContent());
 	else
 	{
@@ -84,13 +87,13 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 		ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
 	}
 
-	if(pamarslist.size()>0)
+	if (pamarslist.size() > 0)
 		ui.comboBox_pamars->setEditText(pamarslist.at(0)->getContent());
 	else
 	{
 		ui.comboBox_pamars->setEditText("");
 	}
-	
+
 
 	QString qtheaderpamars = "";
 	ui.comboBox_header->setEditable(true);
@@ -122,11 +125,11 @@ QString UrlRequestPost(const QString url, const QString data)
 	eventloop.exec(QEventLoop::ExcludeUserInputEvents);
 
 	if (reply->error())
-	{	
+	{
 		qDebug() << reply->errorString();
 
 		go(reply->errorString());
-	
+
 		return "";
 	}
 
@@ -185,7 +188,7 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 		}
 
 		ui.comboBox_url->setEditText(url);
-		
+
 	};
 
 	Log.i("@请求URL:  %s\n", url.toStdString().c_str());
@@ -210,14 +213,14 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 	sql.closeDB();
 
 	//QString->std::string 防止乱码
-	
 
-	string stdStrp= string(qtpamars.toLocal8Bit());
+
+	string stdStrp = string(qtpamars.toLocal8Bit());
 
 	Log.i("@请求参数:  %s\n", stdStrp.c_str());
 
 	EncryptHelper ^helper = gcnew EncryptHelper();
-	
+
 	//cli数据注意前缀^
 	String^ Clipamars = marshal_as<String^>(stdStrp);//std::string->cli::String
 
@@ -238,7 +241,7 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 	QString request = UrlRequestPost(url, qtpamarsStr);//qtPost
 
-	if(request.length()<=0)
+	if (request.length() <= 0)
 		return;
 
 	//QString->std::string 防止乱码
@@ -302,10 +305,10 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //紧凑格式
 		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //标准JSON格式
 		qDebug() << QJsonDocument(jo).toJson(QJsonDocument::Indented);
-		
+
 	}
 	catch (...) {
-		
+
 		ui.et_result->setText(request);
 		qDebug() << request;
 	}
@@ -317,7 +320,7 @@ void QtWidgetsApplication1::on_pushButton_url_clicked()
 	if (urllist.size() <= 0)
 		return;
 
-	QtContent* q= urllist.at(Url_Index);
+	QtContent* q = urllist.at(Url_Index);
 	QString c = q->getContent();
 	if (sql.deletedata(sql.OpenSql(), c) > 0)
 	{
@@ -328,8 +331,8 @@ void QtWidgetsApplication1::on_pushButton_url_clicked()
 		for (i = 0; i < urllist.size(); i++)
 		{
 			ui.comboBox_url->addItem(urllist.at(i)->getContent());
-		}	
-		
+		}
+
 		ui.comboBox_url->setEditText("");
 	};
 
@@ -372,8 +375,8 @@ void QtWidgetsApplication1::on_pushButton_header_clicked()
 QJsonObject getJsonObjectFromString(const QString jsonString) {
 
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toLocal8Bit().data());
-		QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //紧凑格式
-		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //标准JSON格式
+	QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //紧凑格式
+	//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //标准JSON格式
 
 	if (jsonDocument.isNull()) {
 
@@ -412,7 +415,7 @@ void go(QString msg) { // 普通函数go
 // 定义槽函数 mySlot()
 void QtWidgetsApplication1::mySlot(QString msg)
 {
-	
+
 	ui.et_result->setText(msg);
 	//QMessageBox::about(this, "异常信息", msg);
 
@@ -426,6 +429,22 @@ void QtWidgetsApplication1::mySlotUrlIndex(int x)
 void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 {
 	Pamars_Index = x;
+}
+
+void QtWidgetsApplication1::mySlotCopy(bool yes)
+{
+	qDebug() << "QtWidgetsApplication1::mySlotCopy()";
+	if (yes) {
+		//connect(clipboard, SIGNAL(dataChanged()), this, SLOT(mySlotCopy2())); // wait tor CTRL+C
+
+		qDebug() << QString(ui.et_result->document()->toPlainText());
+
+	}
+}
+
+void QtWidgetsApplication1::mySlotCopy2()
+{
+	qDebug() << "QtWidgetsApplication1::mySlotCopy2()";
 }
 
 

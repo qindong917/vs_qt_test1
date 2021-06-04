@@ -7,20 +7,20 @@
 
 class QtWidgetsApplication1 : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QtWidgetsApplication1(QWidget *parent = Q_NULLPTR);
+	QtWidgetsApplication1(QWidget *parent = Q_NULLPTR);
 
 private:
-    Ui::QtWidgetsApplication1Class ui;
+	Ui::QtWidgetsApplication1Class ui;
 
 private slots:
 	void on_pushButton_clicked();
 	void on_pushButton_url_clicked();
 	void on_pushButton_pamars_clicked();
 	void on_pushButton_header_clicked();
-	
+
 
 	// ÐÅºÅÉùÃ÷Çø
 signals:
@@ -36,6 +36,8 @@ public slots:
 
 	void mySlotPamarsIndex(int x);
 
+	void mySlotCopy(bool);
+
+	void mySlotCopy2();
 
 };
-

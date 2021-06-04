@@ -16,6 +16,9 @@ public:
 	void setContent(const QString);
 	QString getContent();
 
+	void setLabel(const QString);
+	QString getLabel();
+
 	void setType(const int);
 	int getType();
 

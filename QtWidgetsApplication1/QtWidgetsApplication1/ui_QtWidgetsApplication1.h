@@ -1,19 +1,21 @@
 /********************************************************************************
-** Form generated from reading UI file 'QtWidgetsApplication1tEcvCk.ui'
+** Form generated from reading UI file 'QtWidgetsApplication1RqBjnA.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.10
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef QTWIDGETSAPPLICATION1TECVCK_H
-#define QTWIDGETSAPPLICATION1TECVCK_H
+#ifndef QTWIDGETSAPPLICATION1RQBJNA_H
+#define QTWIDGETSAPPLICATION1RQBJNA_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
@@ -37,7 +39,17 @@ public:
     QComboBox *comboBox_header;
     QPushButton *pushButton_header;
     QLabel *label_3;
+    QGroupBox *groupBox;
+    QHBoxLayout *horizontalLayout;
     QPushButton *pushButton;
+    QPushButton *pushButton_copy;
+    QPushButton *pushButton_label;
+    QPushButton *pushButton_6;
+    QPushButton *pushButton_8;
+    QPushButton *pushButton_5;
+    QPushButton *pushButton_4;
+    QPushButton *pushButton_3;
+    QPushButton *pushButton_2;
     QTextEdit *et_result;
 
     void setupUi(QMainWindow *QtWidgetsApplication1Class)
@@ -162,22 +174,78 @@ public:
 
         gridLayout->addWidget(label_3, 3, 0, 1, 1);
 
-        pushButton = new QPushButton(centralWidget);
+        groupBox = new QGroupBox(centralWidget);
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
+        groupBox->setSizePolicy(sizePolicy4);
+        groupBox->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        groupBox->setFlat(false);
+        horizontalLayout = new QHBoxLayout(groupBox);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        pushButton = new QPushButton(groupBox);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        sizePolicy1.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
-        pushButton->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy3);
 
-        gridLayout->addWidget(pushButton, 3, 1, 1, 1);
+        horizontalLayout->addWidget(pushButton);
+
+        pushButton_copy = new QPushButton(groupBox);
+        pushButton_copy->setObjectName(QString::fromUtf8("pushButton_copy"));
+
+        horizontalLayout->addWidget(pushButton_copy);
+
+        pushButton_label = new QPushButton(groupBox);
+        pushButton_label->setObjectName(QString::fromUtf8("pushButton_label"));
+
+        horizontalLayout->addWidget(pushButton_label);
+
+        pushButton_6 = new QPushButton(groupBox);
+        pushButton_6->setObjectName(QString::fromUtf8("pushButton_6"));
+
+        horizontalLayout->addWidget(pushButton_6);
+
+        pushButton_8 = new QPushButton(groupBox);
+        pushButton_8->setObjectName(QString::fromUtf8("pushButton_8"));
+
+        horizontalLayout->addWidget(pushButton_8);
+
+        pushButton_5 = new QPushButton(groupBox);
+        pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
+
+        horizontalLayout->addWidget(pushButton_5);
+
+        pushButton_4 = new QPushButton(groupBox);
+        pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
+
+        horizontalLayout->addWidget(pushButton_4);
+
+        pushButton_3 = new QPushButton(groupBox);
+        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+
+        horizontalLayout->addWidget(pushButton_3);
+
+        pushButton_2 = new QPushButton(groupBox);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        horizontalLayout->addWidget(pushButton_2);
+
+
+        gridLayout->addWidget(groupBox, 3, 1, 1, 1);
 
         et_result = new QTextEdit(centralWidget);
         et_result->setObjectName(QString::fromUtf8("et_result"));
-        QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(et_result->sizePolicy().hasHeightForWidth());
-        et_result->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy5(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(et_result->sizePolicy().hasHeightForWidth());
+        et_result->setSizePolicy(sizePolicy5);
 
-        gridLayout->addWidget(et_result, 4, 0, 1, 3);
+        gridLayout->addWidget(et_result, 4, 0, 1, 2);
 
         QtWidgetsApplication1Class->setCentralWidget(centralWidget);
 
@@ -205,7 +273,16 @@ public:
 #endif // QT_NO_TOOLTIP
         pushButton_header->setText(QString());
         label_3->setText(QApplication::translate("QtWidgetsApplication1Class", "\350\277\224\345\233\236", nullptr));
+        groupBox->setTitle(QApplication::translate("QtWidgetsApplication1Class", "\345\212\237\350\203\275", nullptr));
         pushButton->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\217\221\350\265\267\350\257\267\346\261\202", nullptr));
+        pushButton_copy->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\244\215\345\210\266\346\226\207\346\234\254", nullptr));
+        pushButton_label->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\212\240\346\240\207\347\255\276", nullptr));
+        pushButton_6->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        pushButton_8->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        pushButton_5->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        pushButton_4->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        pushButton_3->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        pushButton_2->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
     } // retranslateUi
 
 };
@@ -216,4 +293,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // QTWIDGETSAPPLICATION1TECVCK_H
+#endif // QTWIDGETSAPPLICATION1RQBJNA_H

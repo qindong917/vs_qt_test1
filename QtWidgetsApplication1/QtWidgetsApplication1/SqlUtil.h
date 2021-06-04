@@ -14,7 +14,7 @@ class SqlUtil
 		int insert(QSqlQuery sql_query, int type, QString content);
 
 
-		int update(QSqlQuery sql_query, int type, QString content);
+		int update(QSqlQuery sql_query, QString label, QString content);
 
 
 		QList<QtContent*> query(QSqlQuery sql_query,int type);

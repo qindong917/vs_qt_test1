@@ -14,6 +14,8 @@
 
 #include <iostream>
 #include <QClipboard>
+#include <QMimeData>
+#include <QMessageBox>
 
 #pragma warning(disable : 4996)
 using namespace std;
@@ -45,20 +47,17 @@ extern int i = 0, j = 0;
 extern int Url_Type = 1;
 extern int Pamars_Type = 2;
 extern int Url_Index = 0;
+extern int Focus_Index = 2;
 extern int Pamars_Index = 0;
 QList<QtContent*> urllist;
 QList<QtContent*>pamarslist;
 extern int url_uuid;
 extern int pamars_uuid;
-QClipboard *clipboard;
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	: QMainWindow(parent)
 {
-	clipboard = QApplication::clipboard();
-
 	ui.setupUi(this);
-
 	// 将信号 mySignal() 与槽 mySlot() 相关联
 	connect(this, SIGNAL(mySignal(QString)), this, SLOT(mySlot(QString)));
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
@@ -66,6 +65,14 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
 
 	connect(ui.et_result,SIGNAL(copyAvailable(bool)),this,SLOT(mySlotCopy(bool)));
+	QLineEdit *lineEdit = ui.comboBox_url->lineEdit();	
+
+
+	ui.et_result->installEventFilter(this);  //在窗体上为et_result安装过滤器
+	ui.comboBox_url->installEventFilter(this);  //在窗体上为et_result安装过滤器
+	ui.comboBox_pamars->installEventFilter(this);  //在窗体上为et_result安装过滤器
+
+	
 	urllist= sql.query(sql.OpenSql(), Url_Type);
 	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
 
@@ -215,7 +222,6 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 	sql.closeDB();
 
 	//QString->std::string 防止乱码
-
 
 	string stdStrp = string(qtpamars.toLocal8Bit());
 
@@ -369,6 +375,83 @@ void QtWidgetsApplication1::on_pushButton_header_clicked()
 	//QMessageBox::about(this, "未完成", "现在用不上，没做！");
 }
 
+void QtWidgetsApplication1::on_pushButton_label_clicked()
+{
+	//switch (Focus_Index)
+	//{
+	//case 0: 
+	//{
+
+
+	//	if (urllist.size() <= 0)
+	//		return;
+
+	//	QtContent* q = urllist.at(Url_Index);
+	//	QString c = q->getContent();
+	//	if (sql.update(sql.OpenSql(),QString("label_url"), c) > 0)
+	//	{
+	//		ui.comboBox_url->clear();
+
+	//		urllist = sql.query(sql.OpenSql(), Url_Type);
+
+	//		for (i = 0; i < urllist.size(); i++)
+	//		{
+	//			QtContent* bean = urllist.at(i);
+	//			QString temp("(");
+	//			temp.append(bean->getLabel());
+	//			temp.append(")   ");
+	//			temp.append(bean->getContent());
+	//			ui.comboBox_url->addItem(temp);
+	//		}
+
+	//		//ui.comboBox_url->setEditText("");
+	//	};
+
+	//	sql.closeDB();
+	//}
+	//		break;
+	//case 1:
+	//	
+	//	break;
+	//default:
+	//	break;
+	//}
+}
+
+void QtWidgetsApplication1::on_pushButton_copy_clicked()
+{
+
+	QString str;
+	
+	
+	switch (Focus_Index)
+	{
+	case 0:
+		str = ui.comboBox_url->currentText();
+		break;
+	case 1:
+		str = ui.comboBox_pamars->currentText();
+		break;
+	case 2:
+		str = ui.et_result->document()->toPlainText();
+		break;
+	default:
+		break;
+	}
+
+	string stdStrp = string(str.toLocal8Bit());
+	//目前不知为何QT的剪切板功能不能使用？，使用C++的
+	HWND hWnd = NULL;
+	OpenClipboard(hWnd);//打开剪切板
+	EmptyClipboard();//清空剪切板
+	HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//分配内存
+	char* pData = (char*)GlobalLock(hHandle);//锁定内存，返回申请内存的首地址
+	strcpy_s(pData, 10000, stdStrp.c_str());//或strcpy(pData, "this is a ClipBoard Test.");
+	SetClipboardData(CF_TEXT, hHandle);//设置剪切板数据
+	GlobalUnlock(hHandle);//解除锁定
+	CloseClipboard();//关闭剪切板
+}
+
 
 
 
@@ -426,25 +509,102 @@ void QtWidgetsApplication1::mySlot(QString msg)
 void QtWidgetsApplication1::mySlotUrlIndex(int x)
 {
 	Url_Index = x;
+	ui.comboBox_url->setEditText("1111111");
 }
 // 定义槽函数 mySlotPamarsIndex(int)
 void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 {
 	Pamars_Index = x;
+	ui.comboBox_pamars->setEditText("222222");
 }
 
 void QtWidgetsApplication1::mySlotCopy(bool yes)
 {
-	qDebug() << "QtWidgetsApplication1::mySlotCopy()";
+	
 	if (yes) {
-		//connect(clipboard, SIGNAL(dataChanged()), this, SLOT(mySlotCopy2())); // wait tor CTRL+C
-		qDebug() << QString(ui.et_result->document()->toPlainText());
+		try
+		{
+
+			QString str = ui.et_result->document()->toPlainText();
+			string stdStrp = string(str.toLocal8Bit());
+			//目前不知为何QT的剪切板功能不能使用？，使用C++的
+			HWND hWnd = NULL;
+			OpenClipboard(hWnd);//打开剪切板
+			EmptyClipboard();//清空剪切板
+			HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//分配内存
+			char* pData = (char*)GlobalLock(hHandle);//锁定内存，返回申请内存的首地址
+			strcpy_s(pData, 10000, stdStrp.c_str());//或strcpy(pData, "this is a ClipBoard Test.");
+			SetClipboardData(CF_TEXT, hHandle);//设置剪切板数据
+			GlobalUnlock(hHandle);//解除锁定
+			CloseClipboard();//关闭剪切板
+		}
+		catch (...) {
+			QMessageBox::about(this, QString::fromLocal8Bit("警告"), QString::fromLocal8Bit("复制内容过多"));
+		}
+		
 	}
 }
 
-void QtWidgetsApplication1::mySlotCopy2()
+void QtWidgetsApplication1::mySlotCopy2(bool yes)
 {
-	qDebug() << "QtWidgetsApplication1::mySlotCopy2()";
+	
+}
+
+int color_v = 240;
+bool QtWidgetsApplication1::eventFilter(QObject * watched, QEvent * event)
+{
+	if (watched == ui.et_result)         //首先判断控件(这里指 lineEdit1)
+	{
+		if (event->type() == QEvent::FocusIn)     //然后再判断控件的具体事件 (这里指获得焦点事件)
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			ui.et_result->setPalette(p);
+			Focus_Index = 2;
+		}
+		else if (event->type() == QEvent::FocusOut)    // 这里指 lineEdit1 控件的失去焦点事件
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, Qt::white);
+			ui.et_result->setPalette(p);
+		}
+	}
+
+	if (watched == ui.comboBox_url)         //首先判断控件(这里指 lineEdit1)
+	{
+		if (event->type() == QEvent::FocusIn)     //然后再判断控件的具体事件 (这里指获得焦点事件)
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			ui.comboBox_url->setPalette(p);
+			Focus_Index = 0;
+		}
+		else if (event->type() == QEvent::FocusOut)    // 这里指 lineEdit1 控件的失去焦点事件
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, Qt::white);
+			ui.comboBox_url->setPalette(p);
+		}
+	}
+
+	if (watched == ui.comboBox_pamars)         //首先判断控件(这里指 lineEdit1)
+	{
+		if (event->type() == QEvent::FocusIn)     //然后再判断控件的具体事件 (这里指获得焦点事件)
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			ui.comboBox_pamars->setPalette(p);
+			Focus_Index = 1;
+		}
+		else if (event->type() == QEvent::FocusOut)    // 这里指 lineEdit1 控件的失去焦点事件
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, Qt::white);
+			ui.comboBox_pamars->setPalette(p);
+		}
+	}
+
+	return QWidget::eventFilter(watched, event);     // 最后将事件交给上层对话框
 }
 
 

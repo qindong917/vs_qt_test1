@@ -22,7 +22,7 @@ QSqlQuery SqlUtil::OpenSql() {
 	//创建表格
 	QSqlQuery sql_query;
 
-	if (!sql_query.exec("create table notes(content text primary key, type int)"))
+	if (!sql_query.exec("create table notes(content text primary key, label text, type int)"))
 	{
 		qDebug() << "@Error: Fail to create table." << sql_query.lastError();
 	}
@@ -38,11 +38,13 @@ QSqlQuery SqlUtil::OpenSql() {
 //插入数据
 int SqlUtil::insert(QSqlQuery sql_query, int type, QString content) {
 
-	sql_query.prepare("INSERT INTO notes (content, type) VALUES(:content, :type)");
+	sql_query.prepare("INSERT INTO notes (content, label, type) VALUES(:content, :label, :type)");
 
 	sql_query.bindValue(":content", content);
 
 	sql_query.bindValue(":type", type);
+
+	sql_query.bindValue(":label", "");
 
 	if (!sql_query.exec())
 	{
@@ -59,10 +61,10 @@ int SqlUtil::insert(QSqlQuery sql_query, int type, QString content) {
 
 }
 
-int SqlUtil::update(QSqlQuery sql_query, int type, QString content) {
+int SqlUtil::update(QSqlQuery sql_query, QString label, QString content) {
 
 	//修改数据
-	QString str = QString("update notes set content = %1 ").arg(content);
+	QString str = QString("update notes set label = '%1' where content = '%2'").arg(label).arg(content);
 
 	if (!sql_query.exec(str))
 	{

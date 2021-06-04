@@ -20,6 +20,8 @@ private slots:
 	void on_pushButton_url_clicked();
 	void on_pushButton_pamars_clicked();
 	void on_pushButton_header_clicked();
+	void on_pushButton_copy_clicked();
+	void on_pushButton_label_clicked();
 
 
 	// 信号声明区
@@ -38,6 +40,8 @@ public slots:
 
 	void mySlotCopy(bool);
 
-	void mySlotCopy2();
+	void mySlotCopy2(bool);
+
+	bool eventFilter(QObject *, QEvent *);    //注意这里
 
 };

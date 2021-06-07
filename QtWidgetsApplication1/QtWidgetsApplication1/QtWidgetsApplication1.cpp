@@ -5,6 +5,9 @@
 #include <QtNetwork/QNetworkReply>
 #include <QEventLoop>
 #include <QTextCodec>
+#include <QLineEdit>
+#include <QFont>
+#include <QRect>
 
 #include <QJsonObject> 
 #include <QJsonDocument>
@@ -16,6 +19,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #pragma warning(disable : 4996)
 using namespace std;
@@ -61,17 +65,16 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	// 将信号 mySignal() 与槽 mySlot() 相关联
 	connect(this, SIGNAL(mySignal(QString)), this, SLOT(mySlot(QString)));
 	// 将信号 mySignal(int) 与槽 mySlot(int) 相关联
-	connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
-	connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
-
+	//connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
+	connect(ui.comboBox_url, SIGNAL(activated(int)), this, SLOT(mySlotUrlIndex(int)));
+	//connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
+	connect(ui.comboBox_pamars, SIGNAL(activated(int)), this, SLOT(mySlotPamarsIndex(int)));
+	
 	connect(ui.et_result,SIGNAL(copyAvailable(bool)),this,SLOT(mySlotCopy(bool)));
-	QLineEdit *lineEdit = ui.comboBox_url->lineEdit();	
-
 
 	ui.et_result->installEventFilter(this);  //在窗体上为et_result安装过滤器
-	ui.comboBox_url->installEventFilter(this);  //在窗体上为et_result安装过滤器
-	ui.comboBox_pamars->installEventFilter(this);  //在窗体上为et_result安装过滤器
-
+	ui.comboBox_url->installEventFilter(this);  
+	ui.comboBox_pamars->installEventFilter(this); 
 	
 	urllist= sql.query(sql.OpenSql(), Url_Type);
 	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
@@ -81,7 +84,18 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	ui.comboBox_url->setEditable(true);
 	for (i = 0; i < urllist.size(); i++)
 	{
-		ui.comboBox_url->addItem(urllist.at(i)->getContent());
+		QtContent* bean = urllist.at(i);
+		if (bean->getLabel() == nullptr)
+		{
+			ui.comboBox_url->addItem(bean->getContent());
+		}
+		else {
+			QString temp("(");
+			temp.append(bean->getLabel());
+			temp.append(")   ");
+			temp.append(bean->getContent());
+			ui.comboBox_url->addItem(temp);
+		}
 	}
 	if (urllist.size() > 0)
 		ui.comboBox_url->setEditText(urllist.at(0)->getContent());
@@ -93,7 +107,18 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	ui.comboBox_pamars->setEditable(true);
 	for (i = 0; i < pamarslist.size(); i++)
 	{
-		ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+		QtContent* bean = pamarslist.at(i);
+		if (bean->getLabel() == nullptr)
+		{
+			ui.comboBox_pamars->addItem(bean->getContent());
+		}
+		else {
+			QString temp("(");
+			temp.append(bean->getLabel());
+			temp.append(")   ");
+			temp.append(bean->getContent());
+			ui.comboBox_pamars->addItem(temp);
+		}
 	}
 
 	if (pamarslist.size() > 0)
@@ -193,7 +218,18 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 		for (i = 0; i < urllist.size(); i++)
 		{
-			ui.comboBox_url->addItem(urllist.at(i)->getContent());
+			QtContent* bean = urllist.at(i);
+			if (bean->getLabel() == nullptr) 
+			{
+				ui.comboBox_url->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_url->addItem(temp);
+			}
 		}
 
 		ui.comboBox_url->setEditText(url);
@@ -212,7 +248,18 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 		for (i = 0; i < pamarslist.size(); i++)
 		{
-			ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+			QtContent* bean = pamarslist.at(i);
+			if (bean->getLabel() == nullptr)
+			{
+				ui.comboBox_pamars->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_pamars->addItem(temp);
+			}
 		}
 
 		ui.comboBox_pamars->setEditText(qtpamars);
@@ -338,7 +385,18 @@ void QtWidgetsApplication1::on_pushButton_url_clicked()
 
 		for (i = 0; i < urllist.size(); i++)
 		{
-			ui.comboBox_url->addItem(urllist.at(i)->getContent());
+			QtContent* bean = urllist.at(i);
+			if (bean->getLabel() == nullptr)
+			{
+				ui.comboBox_url->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_url->addItem(temp);
+			}
 		}
 
 		ui.comboBox_url->setEditText("");
@@ -362,7 +420,18 @@ void QtWidgetsApplication1::on_pushButton_pamars_clicked()
 
 		for (i = 0; i < pamarslist.size(); i++)
 		{
-			ui.comboBox_pamars->addItem(pamarslist.at(i)->getContent());
+			QtContent* bean = pamarslist.at(i);
+			if (bean->getLabel() == nullptr)
+			{
+				ui.comboBox_pamars->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_pamars->addItem(temp);
+			}
 		}
 		ui.comboBox_pamars->setEditText("");
 	};
@@ -375,47 +444,135 @@ void QtWidgetsApplication1::on_pushButton_header_clicked()
 	//QMessageBox::about(this, "未完成", "现在用不上，没做！");
 }
 
+void showMessageStr() 
+{
+	QTextCodec* g_pChnCodec = QTextCodec::codecForName("GBK");
+
+	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("确定")));
+
+	QPushButton *cancelbtn = new QPushButton(g_pChnCodec->toUnicode(("取消")));
+
+	QMessageBox *mymsgbox = new QMessageBox;
+
+	mymsgbox->addButton(okbtn, QMessageBox::AcceptRole);
+
+	mymsgbox->addButton(cancelbtn, QMessageBox::RejectRole);
+
+	mymsgbox->setWindowTitle(g_pChnCodec->toUnicode(("输入新标签")));
+
+	mymsgbox->show();
+
+};
+
+
+
+void QtWidgetsApplication1::updataLabel(QString str)
+{
+	switch (Focus_Index)
+	{
+	case 0:
+	{
+		if (urllist.size() <= 0)
+			return;
+
+		QtContent* q = urllist.at(Url_Index);
+		QString c = q->getContent();
+		if (sql.update(sql.OpenSql(), str, c) > 0)
+		{
+			ui.comboBox_url->clear();
+
+			urllist = sql.query(sql.OpenSql(), Url_Type);
+
+			for (i = 0; i < urllist.size(); i++)
+			{
+				QtContent* bean = urllist.at(i);
+				if (bean->getLabel() == nullptr)
+				{
+					ui.comboBox_url->addItem(bean->getContent());
+				}
+				else {
+					QString temp("(");
+					temp.append(bean->getLabel());
+					temp.append(")   ");
+					temp.append(bean->getContent());
+					ui.comboBox_url->addItem(temp);
+				}
+			}
+			ui.comboBox_url->setEditText(c);
+		};
+
+		sql.closeDB();
+	}
+	break;
+	case 1:
+	{
+		if (pamarslist.size() <= 0)
+			return;
+
+		QtContent* q = pamarslist.at(Pamars_Index);
+		QString c = q->getContent();
+		if (sql.update(sql.OpenSql(), str, c) > 0)
+		{
+			ui.comboBox_pamars->clear();
+
+			pamarslist = sql.query(sql.OpenSql(), Pamars_Type);
+
+			for (i = 0; i < pamarslist.size(); i++)
+			{
+				QtContent* bean = pamarslist.at(i);
+				if (bean->getLabel() == nullptr)
+				{
+					ui.comboBox_pamars->addItem(bean->getContent());
+				}
+				else {
+					QString temp("(");
+					temp.append(bean->getLabel());
+					temp.append(")   ");
+					temp.append(bean->getContent());
+					ui.comboBox_pamars->addItem(temp);
+				}
+			}
+
+			ui.comboBox_pamars->setEditText(c);
+		};
+
+		sql.closeDB();
+	}
+	break;
+	default:
+		break;
+	}
+}
+
+void QtWidgetsApplication1:: showInputDialog()
+{
+	bool isOK;
+
+	QTextCodec* g_pChnCodec = QTextCodec::codecForName("GBK");
+
+	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("确定")));
+
+	QString text = QInputDialog::getText(NULL, 
+		g_pChnCodec->toUnicode(("提示")),
+		g_pChnCodec->toUnicode(("输入新标签")),
+		//	QLineEdit::Password,	//输入的是密码，不显示明文
+		QLineEdit::Normal,			//输入框明文
+		NULL,
+		&isOK);
+
+	if (isOK) {
+		/*QMessageBox::information(NULL, "Information",
+			"Your comment is: <b>" + text + "</b>",
+			QMessageBox::Yes | QMessageBox::No,
+			QMessageBox::Yes);*/
+		updataLabel(text);
+	}
+}
+
 void QtWidgetsApplication1::on_pushButton_label_clicked()
 {
-	//switch (Focus_Index)
-	//{
-	//case 0: 
-	//{
-
-
-	//	if (urllist.size() <= 0)
-	//		return;
-
-	//	QtContent* q = urllist.at(Url_Index);
-	//	QString c = q->getContent();
-	//	if (sql.update(sql.OpenSql(),QString("label_url"), c) > 0)
-	//	{
-	//		ui.comboBox_url->clear();
-
-	//		urllist = sql.query(sql.OpenSql(), Url_Type);
-
-	//		for (i = 0; i < urllist.size(); i++)
-	//		{
-	//			QtContent* bean = urllist.at(i);
-	//			QString temp("(");
-	//			temp.append(bean->getLabel());
-	//			temp.append(")   ");
-	//			temp.append(bean->getContent());
-	//			ui.comboBox_url->addItem(temp);
-	//		}
-
-	//		//ui.comboBox_url->setEditText("");
-	//	};
-
-	//	sql.closeDB();
-	//}
-	//		break;
-	//case 1:
-	//	
-	//	break;
-	//default:
-	//	break;
-	//}
+	showInputDialog();
+	
 }
 
 void QtWidgetsApplication1::on_pushButton_copy_clicked()
@@ -508,14 +665,29 @@ void QtWidgetsApplication1::mySlot(QString msg)
 // 定义槽函数 mySlotUrlIndex(int)
 void QtWidgetsApplication1::mySlotUrlIndex(int x)
 {
+	if (x < 0)
+		return;
 	Url_Index = x;
-	ui.comboBox_url->setEditText("1111111");
+	if (Url_Index < urllist.size()) {
+		QtContent* q = urllist.at(Url_Index);
+		QString c = q->getContent();
+		ui.comboBox_url->setEditText(c);
+		//qDebug() << c;
+	}
+	
 }
 // 定义槽函数 mySlotPamarsIndex(int)
 void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 {
+	if (x < 0)
+		return;
 	Pamars_Index = x;
-	ui.comboBox_pamars->setEditText("222222");
+	if(Pamars_Index<pamarslist.size()){
+	QtContent* q = pamarslist.at(Pamars_Index);
+	QString c = q->getContent();
+	ui.comboBox_pamars->setEditText(c);
+	//qDebug() << c;
+	}
 }
 
 void QtWidgetsApplication1::mySlotCopy(bool yes)

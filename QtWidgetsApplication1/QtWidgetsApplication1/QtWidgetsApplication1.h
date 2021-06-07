@@ -11,6 +11,8 @@ class QtWidgetsApplication1 : public QMainWindow
 
 public:
 	QtWidgetsApplication1(QWidget *parent = Q_NULLPTR);
+	void QtWidgetsApplication1::updataLabel(QString str);
+	void showInputDialog();
 
 private:
 	Ui::QtWidgetsApplication1Class ui;

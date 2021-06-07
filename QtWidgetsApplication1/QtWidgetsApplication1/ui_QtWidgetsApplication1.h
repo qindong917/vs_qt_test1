@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'QtWidgetsApplication1RqBjnA.ui'
+** Form generated from reading UI file 'QtWidgetsApplication1KVyRJa.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.10
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef QTWIDGETSAPPLICATION1RQBJNA_H
-#define QTWIDGETSAPPLICATION1RQBJNA_H
+#ifndef QTWIDGETSAPPLICATION1KVYRJA_H
+#define QTWIDGETSAPPLICATION1KVYRJA_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -38,7 +38,6 @@ public:
     QLabel *label_4;
     QComboBox *comboBox_header;
     QPushButton *pushButton_header;
-    QLabel *label_3;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout;
     QPushButton *pushButton;
@@ -51,6 +50,7 @@ public:
     QPushButton *pushButton_3;
     QPushButton *pushButton_2;
     QTextEdit *et_result;
+    QLabel *label_3;
 
     void setupUi(QMainWindow *QtWidgetsApplication1Class)
     {
@@ -169,11 +169,6 @@ public:
 
         gridLayout->addWidget(pushButton_header, 2, 2, 1, 1);
 
-        label_3 = new QLabel(centralWidget);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        gridLayout->addWidget(label_3, 3, 0, 1, 1);
-
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -245,7 +240,12 @@ public:
         sizePolicy5.setHeightForWidth(et_result->sizePolicy().hasHeightForWidth());
         et_result->setSizePolicy(sizePolicy5);
 
-        gridLayout->addWidget(et_result, 4, 0, 1, 2);
+        gridLayout->addWidget(et_result, 5, 0, 1, 2);
+
+        label_3 = new QLabel(centralWidget);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        gridLayout->addWidget(label_3, 3, 0, 1, 1);
 
         QtWidgetsApplication1Class->setCentralWidget(centralWidget);
 
@@ -272,7 +272,6 @@ public:
         pushButton_header->setToolTip(QApplication::translate("QtWidgetsApplication1Class", "<html><head/><body><p>\345\210\240\351\231\244\346\255\244\350\256\260\345\275\225</p></body></html>", nullptr));
 #endif // QT_NO_TOOLTIP
         pushButton_header->setText(QString());
-        label_3->setText(QApplication::translate("QtWidgetsApplication1Class", "\350\277\224\345\233\236", nullptr));
         groupBox->setTitle(QApplication::translate("QtWidgetsApplication1Class", "\345\212\237\350\203\275", nullptr));
         pushButton->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\217\221\350\265\267\350\257\267\346\261\202", nullptr));
         pushButton_copy->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\244\215\345\210\266\346\226\207\346\234\254", nullptr));
@@ -283,6 +282,7 @@ public:
         pushButton_4->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
         pushButton_3->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
         pushButton_2->setText(QApplication::translate("QtWidgetsApplication1Class", "\345\276\205\346\211\251\345\261\225", nullptr));
+        label_3->setText(QApplication::translate("QtWidgetsApplication1Class", "\350\277\224\345\233\236", nullptr));
     } // retranslateUi
 
 };
@@ -293,4 +293,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // QTWIDGETSAPPLICATION1RQBJNA_H
+#endif // QTWIDGETSAPPLICATION1KVYRJA_H

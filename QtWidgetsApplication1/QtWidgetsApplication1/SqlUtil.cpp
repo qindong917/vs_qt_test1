@@ -99,13 +99,17 @@ QList<QtContent*> SqlUtil::query(QSqlQuery sql_query, int type) {
 		{
 			QString content = sql_query.value(0).toString();
 
-			int type = sql_query.value(1).toInt();
+			QString label = sql_query.value(1).toString();
+
+			int type = sql_query.value(2).toInt();
 
 			QtContent *m = new QtContent();
 
 			m->setType(type);
 
 			m->setContent(content);
+
+			m->setLabel(label);
 
 			list.append(m);
 		}

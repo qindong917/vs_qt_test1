@@ -49,6 +49,9 @@
     <ClCompile Include="person.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xcombobox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QtWidgetsApplication1.rc">
@@ -76,6 +79,9 @@
     <QtMoc Include="QtWidgetsApplication1.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="xcombobox.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <Image Include="logo.ico">
@@ -87,5 +93,10 @@
     <Image Include="images\delete_on.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xcombobox.pri">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

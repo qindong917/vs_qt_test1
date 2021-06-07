@@ -1,17 +1,7 @@
 ﻿  uic QtWidgetsApplication1.ui
-  rcc QtWidgetsApplication1.qrc
-  moc QtWidgetsApplication1.h
-D:\visual_studio\Community\Common7\IDE\VC\VCTargets\Microsoft.MetaGen.targets(91,5): warning : 缺少必需的文件“H:\VISUALSTUDIO\WORKSPACE\QTWIDGETSAPPLICATION1\QTWIDGETSAPPLICATION1\HELPERS.DLL”。
-D:\visual_studio\Community\Common7\IDE\VC\VCTargets\Microsoft.MetaGen.targets(91,5): warning : 缺少必需的文件“H:\VISUALSTUDIO\WORKSPACE\QTWIDGETSAPPLICATION1\QTWIDGETSAPPLICATION1\ICSHARPCODE.SHARPZIPLIB.DLL”。
-  person.cpp
-  QtContent.cpp
-  SqlUtil.cpp
-  LogUtil.cpp
   QtWidgetsApplication1.cpp
   main.cpp
-d:\visual_studio\git\vs_qt_test1\qtwidgetsapplication1\qtwidgetsapplication1\qtwidgetsapplication1.cpp(28): warning C4079: 意外的标记“;”
-  qrc_QtWidgetsApplication1.cpp
+d:\visual_studio\git\vs_qt_test1\qtwidgetsapplication1\qtwidgetsapplication1\qtwidgetsapplication1.cpp(35): warning C4079: 意外的标记“;”
   moc_QtWidgetsApplication1.cpp
-  .NETFramework,Version=v4.5.AssemblyAttributes.cpp
   person.obj : 遇到了 MSIL 模块；对 MSIL 禁用了增量链接；正在执行完全链接
   QtWidgetsApplication1.vcxproj -> D:\visual_studio\GIT\vs_qt_test1\QtWidgetsApplication1\x64\Debug\QtWidgetsApplication1.exe

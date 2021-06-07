@@ -35,7 +35,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.12.10_msvc2017_64</QtInstall>
+    <QtInstall>msvc2017_64</QtInstall>
     <QtModules>core;gui;network;sql;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -102,6 +102,7 @@
     <ClCompile Include="person.cpp" />
     <ClCompile Include="QtContent.cpp" />
     <ClCompile Include="SqlUtil.cpp" />
+    <ClCompile Include="xcombobox.cpp" />
     <QtRcc Include="QtWidgetsApplication1.qrc" />
     <QtUic Include="QtWidgetsApplication1.ui" />
     <ClCompile Include="LogUtil.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="person.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SqlUtil.h" />
+    <QtMoc Include="xcombobox.h" />
     <QtMoc Include="QtWidgetsApplication1.h" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +133,9 @@
     <Image Include="images\delete.ico" />
     <Image Include="images\delete_on.ico" />
     <Image Include="logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xcombobox.pri" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

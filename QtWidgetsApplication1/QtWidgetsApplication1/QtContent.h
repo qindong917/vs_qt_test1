@@ -19,6 +19,9 @@ public:
 	void setLabel(const QString);
 	QString getLabel();
 
+	void setLink(const QString);
+	QString getLink();
+
 	void setType(const int);
 	int getType();
 

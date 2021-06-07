@@ -3,6 +3,8 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+
+#include <QUuid>
 #include "QtContent.h"
 
 class SqlUtil
@@ -16,6 +18,7 @@ class SqlUtil
 
 		int update(QSqlQuery sql_query, QString label, QString content);
 
+		int updateLink(QSqlQuery sql_query, QString link, QString content);
 
 		QList<QtContent*> query(QSqlQuery sql_query,int type);
 

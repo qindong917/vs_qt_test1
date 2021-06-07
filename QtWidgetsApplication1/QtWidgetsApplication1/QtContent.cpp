@@ -4,6 +4,7 @@ struct QtContentalDataPrivate // 定义私有数据成员类型
 {
 	QString content; 
 	QString label;
+	QString link;
 	int type; 
 };
 
@@ -39,6 +40,17 @@ void QtContent::setLabel(const QString label)
 QString QtContent::getLabel()
 {
 	return d->label;
+}
+
+void QtContent::setLink(const QString link)
+{
+	if (link != d->link)
+		d->link = link;
+}
+
+QString QtContent::getLink()
+{
+	return d->link;
 }
 
 

@@ -22,7 +22,7 @@ QSqlQuery SqlUtil::OpenSql() {
 	//创建表格
 	QSqlQuery sql_query;
 
-	if (!sql_query.exec("create table notes(content text primary key, label text, type int)"))
+	if (!sql_query.exec("create table notes(content text primary key, label text, link text, type int)"))
 	{
 		qDebug() << "@Error: Fail to create table." << sql_query.lastError();
 	}
@@ -80,6 +80,25 @@ int SqlUtil::update(QSqlQuery sql_query, QString label, QString content) {
 	}
 }
 
+int SqlUtil::updateLink(QSqlQuery sql_query, QString link, QString content) {
+
+	//修改数据
+	QString str = QString("update notes set link = '%1' where content = '%2'").arg(link).arg(content);
+
+	if (!sql_query.exec(str))
+	{
+		qDebug() << sql_query.lastError() << content;
+
+		return -1;
+	}
+	else
+	{
+		qDebug() << "@updated!" << content;
+
+		return 1;
+	}
+}
+
 QList<QtContent*> SqlUtil::query(QSqlQuery sql_query, int type) {
 
 	QList<QtContent*> list;
@@ -101,7 +120,9 @@ QList<QtContent*> SqlUtil::query(QSqlQuery sql_query, int type) {
 
 			QString label = sql_query.value(1).toString();
 
-			int type = sql_query.value(2).toInt();
+			QString link = sql_query.value(2).toString();
+
+			int type = sql_query.value(3).toInt();
 
 			QtContent *m = new QtContent();
 
@@ -110,6 +131,8 @@ QList<QtContent*> SqlUtil::query(QSqlQuery sql_query, int type) {
 			m->setContent(content);
 
 			m->setLabel(label);
+
+			m->setLink(link);
 
 			list.append(m);
 		}

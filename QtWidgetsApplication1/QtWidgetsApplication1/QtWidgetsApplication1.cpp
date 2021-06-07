@@ -234,6 +234,10 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 		ui.comboBox_url->setEditText(url);
 
+		QString qtpamars = ui.comboBox_pamars->currentText().trimmed();
+
+		sql.updateLink(sql.OpenSql(), qtpamars, url);
+
 	};
 
 	Log.i("@«Î«ÛURL:  %s\n", url.toStdString().c_str());
@@ -671,8 +675,16 @@ void QtWidgetsApplication1::mySlotUrlIndex(int x)
 	if (Url_Index < urllist.size()) {
 		QtContent* q = urllist.at(Url_Index);
 		QString c = q->getContent();
+		
 		ui.comboBox_url->setEditText(c);
-		//qDebug() << c;
+
+		QString l = q->getLink();
+		if(nullptr!=l)
+		{
+			ui.comboBox_pamars->setEditText(l);
+		}
+		
+		//qDebug() << c << "\n" << l;
 	}
 	
 }

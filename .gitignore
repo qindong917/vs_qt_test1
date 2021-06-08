@@ -184,3 +184,5 @@ QtWidgetsApplication1/x64/Debug/QtWidgetsApplication1.pdb
 *.lastbuildstate
 *.log
 *.pdb
+/.vs/vs_qt_test1/v15
+/.vs

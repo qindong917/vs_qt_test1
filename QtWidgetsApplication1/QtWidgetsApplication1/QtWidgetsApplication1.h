@@ -24,6 +24,9 @@ private slots:
 	void on_pushButton_header_clicked();
 	void on_pushButton_copy_clicked();
 	void on_pushButton_label_clicked();
+	void on_pushButton_ecode_clicked();
+	void on_pushButton_dcode_clicked();
+	void on_pushButton_batch_clicked();
 
 
 	// ÐÅºÅÉùÃ÷Çø
@@ -39,6 +42,8 @@ public slots:
 	void mySlotUrlIndex(int x);
 
 	void mySlotPamarsIndex(int x);
+
+	void mySlotHeaderIndex(int x);
 
 	void mySlotCopy(bool);
 

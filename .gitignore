@@ -180,3 +180,7 @@ QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/rcc/qrc_QtWidgetsApplica
 QtWidgetsApplication1/QtWidgetsApplication1/x64/Release/uic/ui_QtWidgetsApplication1.h
 QtWidgetsApplication1/x64/Debug/QtWidgetsApplication1.pdb
 /QtWidgetsApplication1/x64
+*.tlog
+*.lastbuildstate
+*.log
+*.pdb

@@ -49,6 +49,12 @@
     <ClCompile Include="person.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="QtBatchWidgetsClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="myFileDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QtWidgetsApplication1.rc">
@@ -71,9 +77,15 @@
     <ClInclude Include="QtContent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="myFileDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="QtWidgetsApplication1.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="QtBatchWidgetsClass.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -87,5 +99,10 @@
     <Image Include="images\delete_on.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="QtBatchWidgetsClass.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-#include "QtWidgetsApplication1.h"
+ï»¿#include "QtWidgetsApplication1.h"
 #include"ui_QtWidgetsApplication1.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
@@ -20,6 +20,10 @@
 #include <QMimeData>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QStyledItemDelegate>
+#include <QCursor>
+#include "QtBatchWidgetsClass.h"
+#include <QFileDialog>
 
 #pragma warning(disable : 4996)
 using namespace std;
@@ -38,46 +42,74 @@ using namespace Helpers;
 #include "SqlUtil.h"
 
 
-QString UrlRequestPost(const QString url, const QString data);
+QString UrlRequestPost(const QString url, const QString data, const QString header);
 LogUtil Log;
 SqlUtil sql;
 QJsonObject getJsonObjectFromString(const QString jsonString);
 QString getStringFromJsonObject(const QJsonObject& jsonObject);
 void go(const QString msg);
 
-QStringList list_url;
-extern int i = 0, j = 0;
+extern int i = 0, j = 0, h = 0;
 
 extern int Url_Type = 1;
 extern int Pamars_Type = 2;
+extern int Header_Type = 3;
 extern int Url_Index = 0;
-extern int Focus_Index = 2;
+extern int Focus_Index = 0;
 extern int Pamars_Index = 0;
+extern int Header_Index = 0;
 QList<QtContent*> urllist;
 QList<QtContent*>pamarslist;
-extern int url_uuid;
-extern int pamars_uuid;
+QList<QtContent*>headerlist;
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	// ½«ĞÅºÅ mySignal() Óë²Û mySlot() Ïà¹ØÁª
+
+	QString str = "QComboBox QAbstractItemView:item{"
+		"font-family: PingFangSC-Regular;"
+		"font-size:26px;"
+		"min-height:50px;"
+		"min-width:20px;}"
+
+		"QComboBox { "
+		"min-height: 50px;"
+		"font-size:26px;}";
+	
+	QStyledItemDelegate* styledItemDelegate = new QStyledItemDelegate();
+
+	ui.comboBox_url->setItemDelegate(styledItemDelegate);
+	ui.comboBox_url->setStyleSheet(str);
+
+	ui.comboBox_pamars->setItemDelegate(styledItemDelegate);
+	ui.comboBox_pamars->setStyleSheet(str);
+
+	ui.comboBox_header->setItemDelegate(styledItemDelegate);
+	ui.comboBox_header->setStyleSheet(str);
+
+
+
+
+	// å°†ä¿¡å· mySignal() ä¸æ§½ mySlot() ç›¸å…³è”
 	connect(this, SIGNAL(mySignal(QString)), this, SLOT(mySlot(QString)));
-	// ½«ĞÅºÅ mySignal(int) Óë²Û mySlot(int) Ïà¹ØÁª
+	// å°†ä¿¡å· mySignal(int) ä¸æ§½ mySlot(int) ç›¸å…³è”
 	//connect(ui.comboBox_url, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotUrlIndex(int)));
 	connect(ui.comboBox_url, SIGNAL(activated(int)), this, SLOT(mySlotUrlIndex(int)));
 	//connect(ui.comboBox_pamars, SIGNAL(currentIndexChanged(int)), this, SLOT(mySlotPamarsIndex(int)));
 	connect(ui.comboBox_pamars, SIGNAL(activated(int)), this, SLOT(mySlotPamarsIndex(int)));
+	connect(ui.comboBox_header, SIGNAL(activated(int)), this, SLOT(mySlotHeaderIndex(int)));
 	
 	connect(ui.et_result,SIGNAL(copyAvailable(bool)),this,SLOT(mySlotCopy(bool)));
 
-	ui.et_result->installEventFilter(this);  //ÔÚ´°ÌåÉÏÎªet_result°²×°¹ıÂËÆ÷
+	ui.et_result->installEventFilter(this);  //åœ¨çª—ä½“ä¸Šä¸ºet_resultå®‰è£…è¿‡æ»¤å™¨
 	ui.comboBox_url->installEventFilter(this);  
 	ui.comboBox_pamars->installEventFilter(this); 
+	ui.comboBox_header->installEventFilter(this); 
 	
-	urllist= sql.query(sql.OpenSql(), Url_Type);
+	urllist=    sql.query(sql.OpenSql(), Url_Type);
 	pamarslist= sql.query(sql.OpenSql(), Pamars_Type);
+	headerlist= sql.query(sql.OpenSql(), Header_Type);
 
 	sql.closeDB();
 
@@ -128,14 +160,34 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget *parent)
 		ui.comboBox_pamars->setEditText("");
 	}
 
-
-	QString qtheaderpamars = "";
 	ui.comboBox_header->setEditable(true);
+	for (i = 0; i < headerlist.size(); i++)
+	{
+		QtContent* bean = headerlist.at(i);
+		if (bean->getLabel() == nullptr)
+		{
+			ui.comboBox_header->addItem(bean->getContent());
+		}
+		else {
+			QString temp("(");
+			temp.append(bean->getLabel());
+			temp.append(")   ");
+			temp.append(bean->getContent());
+			ui.comboBox_header->addItem(temp);
+		}
+	}
+
+	if (headerlist.size() > 0)
+		ui.comboBox_header->setEditText(headerlist.at(0)->getContent());
+	else
+	{
+		ui.comboBox_header->setEditText("");
+	}
 }
 
 
 
-QString UrlRequestPost(const QString url, const QString data)
+QString UrlRequestPost(const QString url, const QString data, const QString header)
 
 {
 	QNetworkAccessManager qnam;
@@ -146,8 +198,28 @@ QString UrlRequestPost(const QString url, const QString data)
 
 	qnr.setRawHeader("Content-Type", "application/json;charset=UTF-8");
 
-	//qnr.setHeader();
-	//ÇëÇó²ÎÊı
+	if (nullptr != header) {
+
+		QJsonDocument jsonResponse = QJsonDocument::fromJson(header.toUtf8());
+
+		QJsonObject jo = jsonResponse.object();
+
+		QJsonObject::const_iterator it = jo.constBegin();
+
+		QJsonObject::const_iterator end = jo.constEnd();
+
+		while (it != end)
+		{
+			QString key = it.key();
+			QString value = it.value().toString();
+			it++;
+			qnr.setRawHeader(key.toUtf8(), value.toUtf8());
+		}
+	}
+
+
+
+	//è¯·æ±‚å‚æ•°
 	QNetworkReply *reply = qnam.post(qnr, data.toLocal8Bit());
 
 
@@ -183,23 +255,23 @@ QString UrlRequestPost(const QString url, const QString data)
 
 }
 
-//%a, %A ¶ÁÈëÒ»¸ö¸¡µãÖµ(½öC99ÓĞĞ§)
-//% c ¶ÁÈëÒ»¸ö×Ö·û
-//%d ¶ÁÈëÊ®½øÖÆÕûÊı
-//%i ¶ÁÈëÊ®½øÖÆ£¬°Ë½øÖÆ£¬Ê®Áù½øÖÆÕûÊı
-//%o ¶ÁÈë°Ë½øÖÆÕûÊı
-//%x, %X ¶ÁÈëÊ®Áù½øÖÆÕûÊı
-//%s ¶ÁÈëÒ»¸ö×Ö·û´®£¬Óö¿Õ¸ñ¡¢ÖÆ±í·û»ò»»ĞĞ·û½áÊø¡£
-//%f, %F, %e, %E, %g, %G ÓÃÀ´ÊäÈëÊµÊı£¬¿ÉÒÔÓÃĞ¡ÊıĞÎÊ½»òÖ¸ÊıĞÎÊ½ÊäÈë
-//%p ¶ÁÈëÒ»¸öÖ¸Õë
-//%u ¶ÁÈëÒ»¸öÎŞ·ûºÅÊ®½øÖÆÕûÊı
-//%n ÖÁ´ËÒÑ¶ÁÈëÖµµÄµÈ¼Û×Ö·ûÊı
-//%[] É¨Ãè×Ö·û¼¯ºÏ
+//%a, %A è¯»å…¥ä¸€ä¸ªæµ®ç‚¹å€¼(ä»…C99æœ‰æ•ˆ)
+//% c è¯»å…¥ä¸€ä¸ªå­—ç¬¦
+//%d è¯»å…¥åè¿›åˆ¶æ•´æ•°
+//%i è¯»å…¥åè¿›åˆ¶ï¼Œå…«è¿›åˆ¶ï¼Œåå…­è¿›åˆ¶æ•´æ•°
+//%o è¯»å…¥å…«è¿›åˆ¶æ•´æ•°
+//%x, %X è¯»å…¥åå…­è¿›åˆ¶æ•´æ•°
+//%s è¯»å…¥ä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œé‡ç©ºæ ¼ã€åˆ¶è¡¨ç¬¦æˆ–æ¢è¡Œç¬¦ç»“æŸã€‚
+//%f, %F, %e, %E, %g, %G ç”¨æ¥è¾“å…¥å®æ•°ï¼Œå¯ä»¥ç”¨å°æ•°å½¢å¼æˆ–æŒ‡æ•°å½¢å¼è¾“å…¥
+//%p è¯»å…¥ä¸€ä¸ªæŒ‡é’ˆ
+//%u è¯»å…¥ä¸€ä¸ªæ— ç¬¦å·åè¿›åˆ¶æ•´æ•°
+//%n è‡³æ­¤å·²è¯»å…¥å€¼çš„ç­‰ä»·å­—ç¬¦æ•°
+//%[] æ‰«æå­—ç¬¦é›†åˆ
 
-//µ÷ÓÃc#×¢Òâ:
-//1£º°ÑÒªµ÷ÓÃµÄdll¸´ÖÆµ½´úÂëÄ¿Â¼ÏÂ£¬
-//2£º#using "./Helpers.dll"
-//3£ºÏîÄ¿-¡·ÊôĞÔ-¡·C/C++ -¡·³£¹æ-¡·¹«¹²ÓïÑÔÔËĞĞÊ±Ö§³Öcli
+//è°ƒç”¨c#æ³¨æ„:
+//1ï¼šæŠŠè¦è°ƒç”¨çš„dllå¤åˆ¶åˆ°ä»£ç ç›®å½•ä¸‹ï¼Œ
+//2ï¼š#using "./Helpers.dll"
+//3ï¼šé¡¹ç›®-ã€‹å±æ€§-ã€‹C/C++ -ã€‹å¸¸è§„-ã€‹å…¬å…±è¯­è¨€è¿è¡Œæ—¶æ”¯æŒcli
 std::string desKey = "19aGeD4K";
 
 void QtWidgetsApplication1::on_pushButton_clicked()
@@ -240,11 +312,11 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 	};
 
-	Log.i("@ÇëÇóURL:  %s\n", url.toStdString().c_str());
+	Log.i("@è¯·æ±‚URL:  %s\n", url.toStdString().c_str());
 
 	QString qtpamars = ui.comboBox_pamars->currentText().trimmed();
 
-	if (sql.insert(sql.OpenSql(), Pamars_Type, qtpamars) > 0)
+	if (nullptr!= qtpamars && sql.insert(sql.OpenSql(), Pamars_Type, qtpamars) > 0)
 	{
 		ui.comboBox_pamars->clear();
 
@@ -269,41 +341,68 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 		ui.comboBox_pamars->setEditText(qtpamars);
 	};
 
+	QString qtheader = ui.comboBox_header->currentText().trimmed();
+
+	if (nullptr != qtheader && sql.insert(sql.OpenSql(), Header_Type, qtheader) > 0)
+	{
+		ui.comboBox_header->clear();
+
+		headerlist = sql.query(sql.OpenSql(), Header_Type);
+
+		for (i = 0; i < headerlist.size(); i++)
+		{
+			QtContent* bean = headerlist.at(i);
+			if (bean->getLabel() == nullptr)
+			{
+				ui.comboBox_header->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_header->addItem(temp);
+			}
+		}
+
+		ui.comboBox_header->setEditText(qtheader);
+	};
+
 
 	sql.closeDB();
 
-	//QString->std::string ·ÀÖ¹ÂÒÂë
+	//QString->std::string é˜²æ­¢ä¹±ç 
 
 	string stdStrp = string(qtpamars.toLocal8Bit());
 
-	Log.i("@ÇëÇó²ÎÊı:  %s\n", stdStrp.c_str());
+	Log.i("@è¯·æ±‚å‚æ•°:  %s\n", stdStrp.c_str());
 
 	EncryptHelper ^helper = gcnew EncryptHelper();
 
-	//cliÊı¾İ×¢ÒâÇ°×º^
+	//cliæ•°æ®æ³¨æ„å‰ç¼€^
 	String^ Clipamars = marshal_as<String^>(stdStrp);//std::string->cli::String
 
 	Text::Encoding ^u8 = Text::Encoding::UTF8;
 
 	cli::array<unsigned char> ^Clipamarsarray = u8->GetBytes(Clipamars);//cli::String->cli::array<unsigned char>
 
-	cli::array<unsigned char> ^Clipamarsarray2 = helper->ZipEncode(Clipamarsarray);//¿ªÊ¼Ñ¹Ëõ
+	cli::array<unsigned char> ^Clipamarsarray2 = helper->ZipEncode(Clipamarsarray);//å¼€å§‹å‹ç¼©
 
-	String^ key = gcnew String(desKey.c_str());//std::string->cli::String£¨·½Ê½2£©
+	String^ key = gcnew String(desKey.c_str());//std::string->cli::Stringï¼ˆæ–¹å¼2ï¼‰
 
-	String ^ClipamarsStr = helper->EncryptDESECB(Clipamarsarray2, key);//¿ªÊ¼DES¼ÓÃÜ
+	String ^ClipamarsStr = helper->EncryptDESECB(Clipamarsarray2, key);//å¼€å§‹DESåŠ å¯†
 
 	string stdpamarsStr = marshal_as<std::string>(ClipamarsStr);//cli::String->std::string
 
 	//QString qtpamarsStr = QString::fromStdString(stdpamarsStr);//std::string->QString
-	QString qtpamarsStr = QString(QString::fromLocal8Bit(stdpamarsStr.c_str()));//std::string->QString ·ÀÖ¹ÂÒÂë
+	QString qtpamarsStr = QString(QString::fromLocal8Bit(stdpamarsStr.c_str()));//std::string->QString é˜²æ­¢ä¹±ç 
 
-	QString request = UrlRequestPost(url, qtpamarsStr);//qtPost
+	QString request = UrlRequestPost(url, qtpamarsStr, qtheader);//qtPost
 
 	if (request.length() <= 0)
 		return;
 
-	//QString->std::string ·ÀÖ¹ÂÒÂë
+	//QString->std::string é˜²æ­¢ä¹±ç 
 	string stdStr = string(request.toLocal8Bit());
 	//string stdStr	= request.toStdString();//QString->std::string
 
@@ -319,17 +418,17 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 	try {
 
-		cli::array<unsigned char> ^p2cli = helper->DecryptDESECB(dec, key);//¿ªÊ¼DES½âÃÜ
+		cli::array<unsigned char> ^p2cli = helper->DecryptDESECB(dec, key);//å¼€å§‹DESè§£å¯†
 
-		cli::array<unsigned char> ^p3cli = helper->ZipDecode(p2cli);//¿ªÊ¼½âÑ¹
+		cli::array<unsigned char> ^p3cli = helper->ZipDecode(p2cli);//å¼€å§‹è§£å‹
 
 		String ^p4cli = u8->GetString(p3cli);//cli::array<unsigned char>->cli::String
 
 		string cliToWstring = marshal_as<std::string>(p4cli);//cli::String->std::string
 
-		Log.i("@·µ»Ø½á¹û:  %s\n", cliToWstring.c_str());
+		Log.i("@è¿”å›ç»“æœ:  %s\n", cliToWstring.c_str());
 
-		QString result = QString(QString::fromLocal8Bit(cliToWstring.c_str()));//std::string->QString ·ÀÖ¹ÂÒÂë
+		QString result = QString(QString::fromLocal8Bit(cliToWstring.c_str()));//std::string->QString é˜²æ­¢ä¹±ç 
 
 		QJsonDocument jsonResponse = QJsonDocument::fromJson(result.toUtf8());
 
@@ -361,8 +460,8 @@ void QtWidgetsApplication1::on_pushButton_clicked()
 
 		ui.et_result->setText(QJsonDocument(jo).toJson(QJsonDocument::Indented));
 
-		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //½ô´Õ¸ñÊ½
-		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //±ê×¼JSON¸ñÊ½
+		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //ç´§å‡‘æ ¼å¼
+		//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //æ ‡å‡†JSONæ ¼å¼
 		qDebug() << QJsonDocument(jo).toJson(QJsonDocument::Indented);
 
 	}
@@ -445,16 +544,45 @@ void QtWidgetsApplication1::on_pushButton_pamars_clicked()
 
 void QtWidgetsApplication1::on_pushButton_header_clicked()
 {
-	//QMessageBox::about(this, "Î´Íê³É", "ÏÖÔÚÓÃ²»ÉÏ£¬Ã»×ö£¡");
+	if (headerlist.size() <= 0)
+		return;
+
+	QtContent* q = headerlist.at(Header_Index);
+	QString c = q->getContent();
+	if (sql.deletedata(sql.OpenSql(), c) > 0)
+	{
+		ui.comboBox_header->clear();
+
+		headerlist = sql.query(sql.OpenSql(), Header_Type);
+
+		for (i = 0; i < headerlist.size(); i++)
+		{
+			QtContent* bean = headerlist.at(i);
+			if (bean->getLabel() == nullptr)
+			{
+				ui.comboBox_header->addItem(bean->getContent());
+			}
+			else {
+				QString temp("(");
+				temp.append(bean->getLabel());
+				temp.append(")   ");
+				temp.append(bean->getContent());
+				ui.comboBox_header->addItem(temp);
+			}
+		}
+		ui.comboBox_header->setEditText("");
+	};
+
+	sql.closeDB();
 }
 
 void showMessageStr() 
 {
 	QTextCodec* g_pChnCodec = QTextCodec::codecForName("GBK");
 
-	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("È·¶¨")));
+	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("ç¡®å®š")));
 
-	QPushButton *cancelbtn = new QPushButton(g_pChnCodec->toUnicode(("È¡Ïû")));
+	QPushButton *cancelbtn = new QPushButton(g_pChnCodec->toUnicode(("å–æ¶ˆ")));
 
 	QMessageBox *mymsgbox = new QMessageBox;
 
@@ -462,7 +590,7 @@ void showMessageStr()
 
 	mymsgbox->addButton(cancelbtn, QMessageBox::RejectRole);
 
-	mymsgbox->setWindowTitle(g_pChnCodec->toUnicode(("ÊäÈëĞÂ±êÇ©")));
+	mymsgbox->setWindowTitle(g_pChnCodec->toUnicode(("è¾“å…¥æ–°æ ‡ç­¾")));
 
 	mymsgbox->show();
 
@@ -543,6 +671,42 @@ void QtWidgetsApplication1::updataLabel(QString str)
 		sql.closeDB();
 	}
 	break;
+
+	case 2:
+	{
+		if (headerlist.size() <= 0)
+			return;
+
+		QtContent* q = headerlist.at(Header_Index);
+		QString c = q->getContent();
+		if (sql.update(sql.OpenSql(), str, c) > 0)
+		{
+			ui.comboBox_header->clear();
+
+			headerlist = sql.query(sql.OpenSql(), Header_Type);
+
+			for (i = 0; i < headerlist.size(); i++)
+			{
+				QtContent* bean = headerlist.at(i);
+				if (bean->getLabel() == nullptr)
+				{
+					ui.comboBox_header->addItem(bean->getContent());
+				}
+				else {
+					QString temp("(");
+					temp.append(bean->getLabel());
+					temp.append(")   ");
+					temp.append(bean->getContent());
+					ui.comboBox_header->addItem(temp);
+				}
+			}
+
+			ui.comboBox_header->setEditText(c);
+		};
+
+		sql.closeDB();
+	}
+	break;
 	default:
 		break;
 	}
@@ -554,13 +718,13 @@ void QtWidgetsApplication1:: showInputDialog()
 
 	QTextCodec* g_pChnCodec = QTextCodec::codecForName("GBK");
 
-	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("È·¶¨")));
+	QPushButton *okbtn = new QPushButton(g_pChnCodec->toUnicode(("ç¡®å®š")));
 
 	QString text = QInputDialog::getText(NULL, 
-		g_pChnCodec->toUnicode(("ÌáÊ¾")),
-		g_pChnCodec->toUnicode(("ÊäÈëĞÂ±êÇ©")),
-		//	QLineEdit::Password,	//ÊäÈëµÄÊÇÃÜÂë£¬²»ÏÔÊ¾Ã÷ÎÄ
-		QLineEdit::Normal,			//ÊäÈë¿òÃ÷ÎÄ
+		g_pChnCodec->toUnicode(("æç¤º")),
+		g_pChnCodec->toUnicode(("è¾“å…¥æ–°æ ‡ç­¾")),
+		//	QLineEdit::Password,	//è¾“å…¥çš„æ˜¯å¯†ç ï¼Œä¸æ˜¾ç¤ºæ˜æ–‡
+		QLineEdit::Normal,			//è¾“å…¥æ¡†æ˜æ–‡
 		NULL,
 		&isOK);
 
@@ -594,6 +758,9 @@ void QtWidgetsApplication1::on_pushButton_copy_clicked()
 		str = ui.comboBox_pamars->currentText();
 		break;
 	case 2:
+		str = ui.comboBox_header->currentText();
+		break;
+	case 3:
 		str = ui.et_result->document()->toPlainText();
 		break;
 	default:
@@ -601,16 +768,99 @@ void QtWidgetsApplication1::on_pushButton_copy_clicked()
 	}
 
 	string stdStrp = string(str.toLocal8Bit());
-	//Ä¿Ç°²»ÖªÎªºÎQTµÄ¼ôÇĞ°å¹¦ÄÜ²»ÄÜÊ¹ÓÃ£¿£¬Ê¹ÓÃC++µÄ
+	//ç›®å‰ä¸çŸ¥ä¸ºä½•QTçš„å‰ªåˆ‡æ¿åŠŸèƒ½ä¸èƒ½ä½¿ç”¨ï¼Ÿï¼Œä½¿ç”¨C++çš„
 	HWND hWnd = NULL;
-	OpenClipboard(hWnd);//´ò¿ª¼ôÇĞ°å
-	EmptyClipboard();//Çå¿Õ¼ôÇĞ°å
-	HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//·ÖÅäÄÚ´æ
-	char* pData = (char*)GlobalLock(hHandle);//Ëø¶¨ÄÚ´æ£¬·µ»ØÉêÇëÄÚ´æµÄÊ×µØÖ·
-	strcpy_s(pData, 10000, stdStrp.c_str());//»òstrcpy(pData, "this is a ClipBoard Test.");
-	SetClipboardData(CF_TEXT, hHandle);//ÉèÖÃ¼ôÇĞ°åÊı¾İ
-	GlobalUnlock(hHandle);//½â³ıËø¶¨
-	CloseClipboard();//¹Ø±Õ¼ôÇĞ°å
+	OpenClipboard(hWnd);//æ‰“å¼€å‰ªåˆ‡æ¿
+	EmptyClipboard();//æ¸…ç©ºå‰ªåˆ‡æ¿
+	HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//åˆ†é…å†…å­˜
+	char* pData = (char*)GlobalLock(hHandle);//é”å®šå†…å­˜ï¼Œè¿”å›ç”³è¯·å†…å­˜çš„é¦–åœ°å€
+	strcpy_s(pData, 10000, stdStrp.c_str());//æˆ–strcpy(pData, "this is a ClipBoard Test.");
+	SetClipboardData(CF_TEXT, hHandle);//è®¾ç½®å‰ªåˆ‡æ¿æ•°æ®
+	GlobalUnlock(hHandle);//è§£é™¤é”å®š
+	CloseClipboard();//å…³é—­å‰ªåˆ‡æ¿
+}
+
+//åŠ å¯†
+void QtWidgetsApplication1::on_pushButton_ecode_clicked()
+{
+	QString qtpamars = ui.et_result->document()->toPlainText().trimmed();
+	//QString->std::string é˜²æ­¢ä¹±ç 
+
+	string stdStrp = string(qtpamars.toLocal8Bit());
+
+	Log.i("@è¯·æ±‚å‚æ•°:  %s\n", stdStrp.c_str());
+
+	EncryptHelper ^helper = gcnew EncryptHelper();
+
+	//cliæ•°æ®æ³¨æ„å‰ç¼€^
+	String^ Clipamars = marshal_as<String^>(stdStrp);//std::string->cli::String
+
+	Text::Encoding ^u8 = Text::Encoding::UTF8;
+
+	cli::array<unsigned char> ^Clipamarsarray = u8->GetBytes(Clipamars);//cli::String->cli::array<unsigned char>
+
+	cli::array<unsigned char> ^Clipamarsarray2 = helper->ZipEncode(Clipamarsarray);//å¼€å§‹å‹ç¼©
+
+	String^ key = gcnew String(desKey.c_str());//std::string->cli::Stringï¼ˆæ–¹å¼2ï¼‰
+
+	String ^ClipamarsStr = helper->EncryptDESECB(Clipamarsarray2, key);//å¼€å§‹DESåŠ å¯†
+
+	string stdpamarsStr = marshal_as<std::string>(ClipamarsStr);//cli::String->std::string
+
+	//QString qtpamarsStr = QString::fromStdString(stdpamarsStr);//std::string->QString
+	QString qtpamarsStr = QString(QString::fromLocal8Bit(stdpamarsStr.c_str()));//std::string->QString é˜²æ­¢ä¹±ç 
+
+	ui.et_result->setText(qtpamarsStr);
+}
+
+//è§£å¯†
+void QtWidgetsApplication1::on_pushButton_dcode_clicked()
+{
+	QString request = ui.et_result->document()->toPlainText().trimmed();
+	//QString->std::string é˜²æ­¢ä¹±ç 
+	string stdStr = string(request.toLocal8Bit());
+	//string stdStr	= request.toStdString();//QString->std::string
+
+	char *cstr = new char[stdStr.length() + 1];
+
+	strcpy(cstr, stdStr.c_str());
+
+	String^ stdToCli = marshal_as<String^>(desKey);//std::string->cli::String
+
+	String^ dec = gcnew String(stdStr.c_str());//std::string->cli::String
+
+	EncryptHelper ^helper = gcnew EncryptHelper();
+
+	String^ key = gcnew String(desKey.c_str());//std::string->cli::Stringï¼ˆæ–¹å¼2ï¼‰
+
+	Text::Encoding ^u8 = Text::Encoding::UTF8;
+
+	try {
+
+		cli::array<unsigned char> ^p2cli = helper->DecryptDESECB(dec, key);//å¼€å§‹DESè§£å¯†
+
+		cli::array<unsigned char> ^p3cli = helper->ZipDecode(p2cli);//å¼€å§‹è§£å‹
+
+		String ^p4cli = u8->GetString(p3cli);//cli::array<unsigned char>->cli::String
+
+		string cliToWstring = marshal_as<std::string>(p4cli);//cli::String->std::string
+
+		Log.i("@è¿”å›ç»“æœ:  %s\n", cliToWstring.c_str());
+
+		QString result = QString(QString::fromLocal8Bit(cliToWstring.c_str()));//std::string->QString é˜²æ­¢ä¹±ç 
+
+		QJsonDocument jsonResponse = QJsonDocument::fromJson(result.toUtf8());
+
+		QJsonObject jo = jsonResponse.object();
+
+		ui.et_result->setText(QJsonDocument(jo).toJson(QJsonDocument::Indented));
+
+	}
+	catch (...) {
+
+		ui.et_result->setText(request);
+		qDebug() << request;
+	}
 }
 
 
@@ -621,8 +871,8 @@ void QtWidgetsApplication1::on_pushButton_copy_clicked()
 QJsonObject getJsonObjectFromString(const QString jsonString) {
 
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toLocal8Bit().data());
-	QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //½ô´Õ¸ñÊ½
-	//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //±ê×¼JSON¸ñÊ½
+	QByteArray root_str = jsonDocument.toJson(QJsonDocument::Compact);  //ç´§å‡‘æ ¼å¼
+	//QByteArray root_str = jsonDocument.toJson(QJsonDocument::Indented);   //æ ‡å‡†JSONæ ¼å¼
 
 	if (jsonDocument.isNull()) {
 
@@ -645,28 +895,28 @@ QString getStringFromJsonObject(const QJsonObject& jsonObject) {
 }
 
 
-void go(QString msg) { // ÆÕÍ¨º¯Êıgo
+void go(QString msg) { // æ™®é€šå‡½æ•°go
 
-	for (QWidget *w : qApp->topLevelWidgets()) { // »ñÈ¡¶¥¼¶´°¿Ú
+	for (QWidget *w : qApp->topLevelWidgets()) { // è·å–é¡¶çº§çª—å£
 
 		qDebug() << w->objectName();
-		if (w->objectName() == "QtWidgetsApplication1Class") // ÅĞ¶ÏÊÇ·ñÊÇÖ÷´°¿ÚÀàÃû£ºÖ÷´°¿ÚÀà + Class
-		{                                                // ÎÒµÄÖ÷´°¿ÚÀàÊÇ£ºQtGuiApplication1
-			QtWidgetsApplication1* qw = (QtWidgetsApplication1*)w; // ×ª»»²¢»ñÈ¡Ö÷´°¿ÚÖ¸Õë
+		if (w->objectName() == "QtWidgetsApplication1Class") // åˆ¤æ–­æ˜¯å¦æ˜¯ä¸»çª—å£ç±»åï¼šä¸»çª—å£ç±» + Class
+		{                                                // æˆ‘çš„ä¸»çª—å£ç±»æ˜¯ï¼šQtGuiApplication1
+			QtWidgetsApplication1* qw = (QtWidgetsApplication1*)w; // è½¬æ¢å¹¶è·å–ä¸»çª—å£æŒ‡é’ˆ
 			emit qw->mySignal(msg);
 		}
 	}
 }
 
-// ¶¨Òå²Ûº¯Êı mySlot()
+// å®šä¹‰æ§½å‡½æ•° mySlot()
 void QtWidgetsApplication1::mySlot(QString msg)
 {
 
 	ui.et_result->setText(msg);
-	//QMessageBox::about(this, "Òì³£ĞÅÏ¢", msg);
+	//QMessageBox::about(this, "å¼‚å¸¸ä¿¡æ¯", msg);
 
 }
-// ¶¨Òå²Ûº¯Êı mySlotUrlIndex(int)
+// å®šä¹‰æ§½å‡½æ•° mySlotUrlIndex(int)
 void QtWidgetsApplication1::mySlotUrlIndex(int x)
 {
 	if (x < 0)
@@ -688,7 +938,7 @@ void QtWidgetsApplication1::mySlotUrlIndex(int x)
 	}
 	
 }
-// ¶¨Òå²Ûº¯Êı mySlotPamarsIndex(int)
+// å®šä¹‰æ§½å‡½æ•° mySlotPamarsIndex(int)
 void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 {
 	if (x < 0)
@@ -702,6 +952,20 @@ void QtWidgetsApplication1::mySlotPamarsIndex(int x)
 	}
 }
 
+// å®šä¹‰æ§½å‡½æ•° mySlotPamarsIndex(int)
+void QtWidgetsApplication1::mySlotHeaderIndex(int x)
+{
+	if (x < 0)
+		return;
+	Header_Index = x;
+	if (Header_Index < headerlist.size()) {
+		QtContent* q = headerlist.at(Header_Index);
+		QString c = q->getContent();
+		ui.comboBox_header->setEditText(c);
+		//qDebug() << c;
+	}
+}
+
 void QtWidgetsApplication1::mySlotCopy(bool yes)
 {
 	
@@ -710,20 +974,21 @@ void QtWidgetsApplication1::mySlotCopy(bool yes)
 		{
 
 			QString str = ui.et_result->document()->toPlainText();
+
 			string stdStrp = string(str.toLocal8Bit());
-			//Ä¿Ç°²»ÖªÎªºÎQTµÄ¼ôÇĞ°å¹¦ÄÜ²»ÄÜÊ¹ÓÃ£¿£¬Ê¹ÓÃC++µÄ
+			//ç›®å‰ä¸çŸ¥ä¸ºä½•QTçš„å‰ªåˆ‡æ¿åŠŸèƒ½ä¸èƒ½ä½¿ç”¨ï¼Ÿï¼Œä½¿ç”¨C++çš„
 			HWND hWnd = NULL;
-			OpenClipboard(hWnd);//´ò¿ª¼ôÇĞ°å
-			EmptyClipboard();//Çå¿Õ¼ôÇĞ°å
-			HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//·ÖÅäÄÚ´æ
-			char* pData = (char*)GlobalLock(hHandle);//Ëø¶¨ÄÚ´æ£¬·µ»ØÉêÇëÄÚ´æµÄÊ×µØÖ·
-			strcpy_s(pData, 10000, stdStrp.c_str());//»òstrcpy(pData, "this is a ClipBoard Test.");
-			SetClipboardData(CF_TEXT, hHandle);//ÉèÖÃ¼ôÇĞ°åÊı¾İ
-			GlobalUnlock(hHandle);//½â³ıËø¶¨
-			CloseClipboard();//¹Ø±Õ¼ôÇĞ°å
+			OpenClipboard(hWnd);//æ‰“å¼€å‰ªåˆ‡æ¿
+			EmptyClipboard();//æ¸…ç©ºå‰ªåˆ‡æ¿
+			HANDLE hHandle = GlobalAlloc(GMEM_FIXED, 10000);//åˆ†é…å†…å­˜
+			char* pData = (char*)GlobalLock(hHandle);//é”å®šå†…å­˜ï¼Œè¿”å›ç”³è¯·å†…å­˜çš„é¦–åœ°å€
+			strcpy_s(pData, 10000, stdStrp.c_str());//æˆ–strcpy(pData, "this is a ClipBoard Test.");
+			SetClipboardData(CF_TEXT, hHandle);//è®¾ç½®å‰ªåˆ‡æ¿æ•°æ®
+			GlobalUnlock(hHandle);//è§£é™¤é”å®š
+			CloseClipboard();//å…³é—­å‰ªåˆ‡æ¿
 		}
 		catch (...) {
-			QMessageBox::about(this, QString::fromLocal8Bit("¾¯¸æ"), QString::fromLocal8Bit("¸´ÖÆÄÚÈİ¹ı¶à"));
+			QMessageBox::about(this, QString::fromLocal8Bit("è­¦å‘Š"), QString::fromLocal8Bit("å¤åˆ¶å†…å®¹è¿‡å¤š"));
 		}
 		
 	}
@@ -734,19 +999,21 @@ void QtWidgetsApplication1::mySlotCopy2(bool yes)
 	
 }
 
-int color_v = 240;
+int color_r = 169;
+int color_g = 208;
+int color_b = 245;
 bool QtWidgetsApplication1::eventFilter(QObject * watched, QEvent * event)
 {
-	if (watched == ui.et_result)         //Ê×ÏÈÅĞ¶Ï¿Ø¼ş(ÕâÀïÖ¸ lineEdit1)
+	if (watched == ui.et_result)         //é¦–å…ˆåˆ¤æ–­æ§ä»¶(è¿™é‡ŒæŒ‡ lineEdit1)
 	{
-		if (event->type() == QEvent::FocusIn)     //È»ºóÔÙÅĞ¶Ï¿Ø¼şµÄ¾ßÌåÊÂ¼ş (ÕâÀïÖ¸»ñµÃ½¹µãÊÂ¼ş)
+		if (event->type() == QEvent::FocusIn)     //ç„¶åå†åˆ¤æ–­æ§ä»¶çš„å…·ä½“äº‹ä»¶ (è¿™é‡ŒæŒ‡è·å¾—ç„¦ç‚¹äº‹ä»¶)
 		{
 			QPalette p = QPalette();
-			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			p.setColor(QPalette::Base, QColor(color_r, color_g, color_b, 255));
 			ui.et_result->setPalette(p);
-			Focus_Index = 2;
+			Focus_Index = 3;
 		}
-		else if (event->type() == QEvent::FocusOut)    // ÕâÀïÖ¸ lineEdit1 ¿Ø¼şµÄÊ§È¥½¹µãÊÂ¼ş
+		else if (event->type() == QEvent::FocusOut)    // è¿™é‡ŒæŒ‡ lineEdit1 æ§ä»¶çš„å¤±å»ç„¦ç‚¹äº‹ä»¶
 		{
 			QPalette p = QPalette();
 			p.setColor(QPalette::Base, Qt::white);
@@ -754,16 +1021,16 @@ bool QtWidgetsApplication1::eventFilter(QObject * watched, QEvent * event)
 		}
 	}
 
-	if (watched == ui.comboBox_url)         //Ê×ÏÈÅĞ¶Ï¿Ø¼ş(ÕâÀïÖ¸ lineEdit1)
+	if (watched == ui.comboBox_url)         //é¦–å…ˆåˆ¤æ–­æ§ä»¶(è¿™é‡ŒæŒ‡ lineEdit1)
 	{
-		if (event->type() == QEvent::FocusIn)     //È»ºóÔÙÅĞ¶Ï¿Ø¼şµÄ¾ßÌåÊÂ¼ş (ÕâÀïÖ¸»ñµÃ½¹µãÊÂ¼ş)
+		if (event->type() == QEvent::FocusIn)     //ç„¶åå†åˆ¤æ–­æ§ä»¶çš„å…·ä½“äº‹ä»¶ (è¿™é‡ŒæŒ‡è·å¾—ç„¦ç‚¹äº‹ä»¶)
 		{
 			QPalette p = QPalette();
-			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			p.setColor(QPalette::Base, QColor(color_r, color_g, color_b, 255));
 			ui.comboBox_url->setPalette(p);
 			Focus_Index = 0;
 		}
-		else if (event->type() == QEvent::FocusOut)    // ÕâÀïÖ¸ lineEdit1 ¿Ø¼şµÄÊ§È¥½¹µãÊÂ¼ş
+		else if (event->type() == QEvent::FocusOut)    // è¿™é‡ŒæŒ‡ lineEdit1 æ§ä»¶çš„å¤±å»ç„¦ç‚¹äº‹ä»¶
 		{
 			QPalette p = QPalette();
 			p.setColor(QPalette::Base, Qt::white);
@@ -771,16 +1038,16 @@ bool QtWidgetsApplication1::eventFilter(QObject * watched, QEvent * event)
 		}
 	}
 
-	if (watched == ui.comboBox_pamars)         //Ê×ÏÈÅĞ¶Ï¿Ø¼ş(ÕâÀïÖ¸ lineEdit1)
+	if (watched == ui.comboBox_pamars)         //é¦–å…ˆåˆ¤æ–­æ§ä»¶(è¿™é‡ŒæŒ‡ lineEdit1)
 	{
-		if (event->type() == QEvent::FocusIn)     //È»ºóÔÙÅĞ¶Ï¿Ø¼şµÄ¾ßÌåÊÂ¼ş (ÕâÀïÖ¸»ñµÃ½¹µãÊÂ¼ş)
+		if (event->type() == QEvent::FocusIn)     //ç„¶åå†åˆ¤æ–­æ§ä»¶çš„å…·ä½“äº‹ä»¶ (è¿™é‡ŒæŒ‡è·å¾—ç„¦ç‚¹äº‹ä»¶)
 		{
 			QPalette p = QPalette();
-			p.setColor(QPalette::Base, QColor(color_v, color_v, color_v, 255));
+			p.setColor(QPalette::Base, QColor(color_r, color_g, color_b, 255));
 			ui.comboBox_pamars->setPalette(p);
 			Focus_Index = 1;
 		}
-		else if (event->type() == QEvent::FocusOut)    // ÕâÀïÖ¸ lineEdit1 ¿Ø¼şµÄÊ§È¥½¹µãÊÂ¼ş
+		else if (event->type() == QEvent::FocusOut)    // è¿™é‡ŒæŒ‡ lineEdit1 æ§ä»¶çš„å¤±å»ç„¦ç‚¹äº‹ä»¶
 		{
 			QPalette p = QPalette();
 			p.setColor(QPalette::Base, Qt::white);
@@ -788,7 +1055,51 @@ bool QtWidgetsApplication1::eventFilter(QObject * watched, QEvent * event)
 		}
 	}
 
-	return QWidget::eventFilter(watched, event);     // ×îºó½«ÊÂ¼ş½»¸øÉÏ²ã¶Ô»°¿ò
+	if (watched == ui.comboBox_header)         //é¦–å…ˆåˆ¤æ–­æ§ä»¶(è¿™é‡ŒæŒ‡ lineEdit1)
+	{
+		if (event->type() == QEvent::FocusIn)     //ç„¶åå†åˆ¤æ–­æ§ä»¶çš„å…·ä½“äº‹ä»¶ (è¿™é‡ŒæŒ‡è·å¾—ç„¦ç‚¹äº‹ä»¶)
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, QColor(color_r, color_g, color_b, 255));
+			ui.comboBox_header->setPalette(p);
+			Focus_Index = 2;
+		}
+		else if (event->type() == QEvent::FocusOut)    // è¿™é‡ŒæŒ‡ lineEdit1 æ§ä»¶çš„å¤±å»ç„¦ç‚¹äº‹ä»¶
+		{
+			QPalette p = QPalette();
+			p.setColor(QPalette::Base, Qt::white);
+			ui.comboBox_header->setPalette(p);
+		}
+	}
+
+	return QWidget::eventFilter(watched, event);     // æœ€åå°†äº‹ä»¶äº¤ç»™ä¸Šå±‚å¯¹è¯æ¡†
+}
+
+void  QtWidgetsApplication1::on_pushButton_batch_clicked() 
+{
+
+	/*æ€»ç»“ï¼š
+	index mainForm;
+	mainForm.show();
+	mainFormåˆ›å»ºåœ¨stackä¸Šï¼Œç”Ÿå‘½æœŸæ˜¯å¤§æ‹¬å·å†…
+
+	index *mainForm;
+	mainForm = new index();
+	mainForm.show();
+	mainForm é€šè¿‡newåˆ›å»ºåœ¨heapä¸Šï¼Œ åœ¨ç¨‹åºé€€å‡ºæ—¶æ‰ä¼šè¢«ææ„*/
+
+	QtBatchWidgetsClass *w;
+
+	w = new QtBatchWidgetsClass();
+
+	QTextCodec* g_pChnCodec = QTextCodec::codecForName("GBK");
+
+	w->setWindowTitle(g_pChnCodec->toUnicode("æ‰¹é‡ä»»åŠ¡"));
+
+	w->show();
+
+	//this->hide();
+
 }
 
 

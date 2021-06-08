@@ -40,7 +40,7 @@
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>msvc2017_64</QtInstall>
+    <QtInstall>5.12.10_msvc2017_64</QtInstall>
     <QtModules>core;gui;network;sql;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -65,11 +65,16 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\lib\Qt5Widgetsd.lib;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\lib\Qt5Guid.lib;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\lib\Qt5Cored.lib;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\lib\qtmaind.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\include;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\include\QtWidgets;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\include\QtGui;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\include\QtANGLE;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\include\QtCore;H:\VISUALSTUDIO\QT\5.12.10\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -99,10 +104,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="myFileDlg.cpp" />
     <ClCompile Include="person.cpp" />
+    <ClCompile Include="QtBatchWidgetsClass.cpp" />
     <ClCompile Include="QtContent.cpp" />
     <ClCompile Include="SqlUtil.cpp" />
     <QtRcc Include="QtWidgetsApplication1.qrc" />
+    <QtUic Include="QtBatchWidgetsClass.ui" />
     <QtUic Include="QtWidgetsApplication1.ui" />
     <ClCompile Include="LogUtil.cpp" />
     <ClCompile Include="QtWidgetsApplication1.cpp" />
@@ -113,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LogUtil.h" />
+    <QtMoc Include="QtBatchWidgetsClass.h" />
+    <ClInclude Include="myFileDlg.h" />
     <ClInclude Include="QtContent.h" />
     <ClInclude Include="person.h" />
     <ClInclude Include="resource.h" />
